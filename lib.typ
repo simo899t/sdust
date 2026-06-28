@@ -10,7 +10,7 @@
 #import "@preview/tdtr:0.5.2" : *
 #import "@preview/h-graph:0.1.0": *
 #import "@preview/cetz:0.3.4": canvas, draw
-#import "@preview/curryst:0.6.0": rule as _curryst-rule, prooftree as _curryst-prooftree
+#import "@preview/curryst:0.6.0": rule, prooftree, rule-set
 #import "@preview/codly:1.3.0": codly, codly-init
 #import "@preview/codly-languages:0.1.10": codly-languages
 #let dirgraph(src) = h-graph(src, polar-render)
@@ -138,6 +138,12 @@
 
 // Common abbreviations / operators
 #let def = $=^"def"$
+#let kplus = $k+1$
+#let kmin = $k-1$
+#let iplus = $i+1$
+#let imin = $i-1$
+#let nplus = $n+1$
+#let nmin = $n-1$
 #let wrt = $w.r.t$
 #let ie = $i.e.$
 #let eg = $e.g.$
@@ -159,8 +165,9 @@
 #let tran(x) = $#x^sans(T)$
 #let inv(x) = $#x^sans(-1)$
 #let Astar = $A^star$
-#let pred(a) = $accent(#a,\^)$
-#let ubar(a) = $accent(#a, \u{0331})$
+#let pred(a) = $hat(#a)$
+#let ubar(a) = $underline(#a)$
+#let obar(a) = $overline(#a)$
 
 // Spacing helpers
 #let qquad = $quad quad$
@@ -191,7 +198,7 @@
 #let ReLU(x) = $"ReLU"(#x)$
 #let GeLU(x) = $"GeLU"(#x)$
 #let loss = $cal(L)$
-#let gaus = $cal(N)$
+#let gauss = $cal(N)$
 
 // Big operators
 #let int(a,b,c) = $integral_(#a)^(#b) #c$
@@ -248,10 +255,9 @@
 )$
 
 // Gradient / Laplacian
-#let nf(g) = $nabla f(#g)$        // ∇g for any g  e.g. nf(f), nf($f$)
-#let nf = $nabla f$         // ∇f  (shorthand constant)
-#let nnf(x) = $nabla^2 f(#x)$  // Laplacian of f
 
+#let nf = $nabla f$         // ∇f  (shorthand constant)
+#let nnf = $nabla^2 f$      // ∇^2f  (shorthand constant)
 
 // ══════════════════════════════════════════════════════
 // SYMBOL ALIASES
@@ -275,11 +281,40 @@
 // ══════════════════════════════════════════════════════
 // PROOF TREES  (curryst)
 // ══════════════════════════════════════════════════════
-
-#import "@preview/curryst:0.6.0": rule, prooftree, rule-set
-
+#let prooftree = rule(
+  label: [Label],
+  name: [Rule name],
+  [Premise 1],
+  [Premise 2],
+  [Premise 3],
+  [Conclusion],
+)
 // Pseudocode
 #let pseudo = pseudocode-list
+
+// ══════════════════════════════════════════════════════
+// TREES  (tidy)
+// ══════════════════════════════════════════════════════
+#let tree(body, reverse: false, shape: "circle", draw-node: none, ..args) = {
+  let shape-draw-node = if shape == "circle" {
+    tidy-tree-draws.circle-draw-node
+  } else if shape == "rect" or shape == "rectangle" {
+    ((name, label, pos)) => (shape: rect)
+  } else if shape == "square" {
+    ((name, label, pos)) => (shape: rect, width: 1.6em, height: 1.6em)
+  } else if shape == none {
+    tidy-tree-draws.hidden-draw-node
+  } else {
+    tidy-tree-draws.circle-draw-node
+  }
+  let effective-draw-node = if draw-node != none { draw-node } else { shape-draw-node }
+  let draw-nodes = if reverse {
+    (effective-draw-node, ((name, label, pos)) => (pos: (pos.x, -pos.y)))
+  } else {
+    effective-draw-node
+  }
+  tidy-tree-graph(body, draw-node: draw-nodes, ..args)
+}
 
 
 // ══════════════════════════════════════════════════════
@@ -766,95 +801,6 @@
   base-style(body)
 }
 
-// ── chi — ACM CHI paper ──────────────────────────────
-#let chi(
-  title: default-title,
-  authors: (),
-  abstract: [],
-  keywords: (),
-  ccs: none,
-  date: default-date,
-  outline: false,
-  ..args,
-) = {
-  let body = args.pos().at(0, default: [])
-  set page(paper: "us-letter", margin: (x: 1.9cm, y: 2.3cm))
-  set text(size: 9.5pt)
-
-  v(0.5cm)
-  align(center, text(size: 18pt, weight: "bold")[#title])
-  v(1.5em)
-
-  let authors-arr = if type(authors) == str {
-    ((name: authors),)
-  } else if authors.len() > 0 and type(authors.at(0)) == str {
-    authors.map(n => (name: n))
-  } else {
-    authors
-  }
-  if authors-arr.len() > 0 {
-    let render-author(a) = align(center, stack(
-      spacing: 0.3em,
-      text(weight: "bold", size: 10.5pt)[#a.at("name", default: "")],
-      if a.at("institution", default: "") != "" { text(size: 9pt)[#a.at("institution", default: "")] },
-      if a.at("city", default: "") != "" or "country" in a {
-        text(size: 9pt)[#a.at("city", default: "")#if "country" in a [, #a.country]]
-      },
-      if a.at("email", default: "") != "" {
-        text(size: 9pt, fill: rgb("#0055aa"))[#a.at("email", default: "")]
-      },
-    ))
-
-    let n = authors-arr.len()
-    let row-starts = range(0, n, step: 3)
-    for i in row-starts {
-      let row = authors-arr.slice(i, calc.min(i + 3, n))
-      align(center,
-        box(width: (100% * row.len() / 3),
-          grid(columns: (1fr,) * row.len(), column-gutter: 2em,
-            ..row.map(render-author))
-        )
-      )
-      if i + 3 < n { v(1.5em) }
-    }
-
-    v(1.8em)
-    align(center, text(size: 9pt, fill: rgb("#888888"))[#date])
-    v(1em)
-  }
-
-  let has-meta = abstract != [] or keywords != () or ccs != none
-  if has-meta {
-    line(length: 100%, stroke: 0.5pt + rgb("#888888"))
-    v(1em)
-    columns(2, gutter: 1.5em, [
-      #if abstract != [] {
-        text(weight: "bold", size: 8.5pt, tracking: 0.8pt)[ABSTRACT]
-        v(0.4em)
-        abstract
-      }
-      #if ccs != none {
-        v(0.8em)
-        text(weight: "bold", size: 8.5pt, tracking: 0.8pt)[CCS CONCEPTS]
-        v(0.4em)
-        ccs
-      }
-      #if keywords != () {
-        v(0.8em)
-        text(weight: "bold", size: 8.5pt, tracking: 0.8pt)[KEYWORDS]
-        v(0.4em)
-        keywords.join("; ")
-      }
-    ])
-  }
-
-  line(length: 100%, stroke: 0.5pt + rgb("#888888"))
-  v(1em)
-  if outline { pagebreak(); std.outline(); pagebreak() }
-  base-style(body)
-}
-
-
 /*
 =============================================================
 TEMPLATES — copy the block you need into a new file
@@ -974,22 +920,4 @@ Content goes here.
 = Introduction
 Content goes here.
 
-── CHI PAPER ─────────────────────────────────────────────────
-#import "../../temp.typ": *
-#show: chi.with(
-  title: "Paper Title",
-  authors: (
-    (name: "Firstname Lastname", institution: "University", city: "City", country: "County", email: "mail@mail.com"),
-    (name: "Firstname Lastname", institution: "University", city: "City", country: "County", email: "mail@mail.com"),
-  ),
-  abstract: [Your abstract text here.],
-  keywords: ("keyword one", "keyword two", "keyword three"),
-  ccs:      [\u{2192} text1 \u{2192} text2], // optional
-  date:     "date",
-  outline:  false,
-)
-#set page(columns: 2)
-
-= Introduction
-Content goes here.
 */
