@@ -11,63 +11,48 @@
 #import "@preview/h-graph:0.1.0": *
 #import "@preview/cetz:0.3.4": canvas, draw
 #import "@preview/curryst:0.6.0": rule, prooftree, rule-set
-#import "@preview/codly:1.3.0": codly, codly-init
+#import "@preview/codly:1.3.0": codly, codly-init, no-codly
 #import "@preview/codly-languages:0.1.10": codly-languages
+#import "@preview/fletcher:0.5.7" as fletcher: diagram, node, edge
+#import "@preview/itemize:0.2.0" as itmz
 #let dirgraph(src) = h-graph(src, polar-render)
+
+// simple node/edge graph, e.g.
+// #graph(
+//   nodes: ((pos: (0,0), label: $1$), (pos: (1,1), label: $2$)),
+//   edges: (((0,0), (1,1)),),
+// )
+#let graph(nodes: (), edges: (), spacing: 3em, radius: 1.2em, arrow: "-", caption: none) = figure(
+  diagram(
+    node-stroke: 1pt,
+    edge-stroke: 1pt,
+    spacing: spacing,
+    ..nodes.map(n => node(n.pos, n.label, radius: radius)),
+    ..edges.map(e => edge(e.at(0), e.at(1), e.at(2, default: arrow))),
+  ),
+  caption: caption,
+)
 
 
 // ══════════════════════════════════════════════════════
 // BASE STYLE
 // ══════════════════════════════════════════════════════
 
-#let base-style(body) = {
-  show: _word-count
-  set text(font: "Computer Modern", size: 12pt)
-  set heading(numbering: "1.1")
-  set enum(numbering: "1.")
-  set math.equation(numbering: none)
-  set math.mat(delim: "[", gap: 0.3em)
-  set par(justify: true)
-  set image(width: 30em)
-  show grid: it => {
-    set image(width: auto)
-    it
-  }
-  show raw.where(block: true): it => {
-    set text(font: ("Menlo", "DejaVu Sans Mono"), size: 9.5pt)
-    let lang = it.lang
-    std.block(
-      breakable: false,
-      width: 100%,
-      {
-        it
-        if lang != none and lang != "" {
-          place(
-            top + right,
-            dx: -4pt,
-            dy: 4pt,
-            box(
-              fill: rgb("#4a5568"),
-              inset: (x: 5pt, y: 2pt),
-              radius: 2pt,
-              text(size: 7pt, weight: "bold", fill: white, font: "Times New Roman", upper(lang)),
-            ),
-          )
-        }
-      },
-    )
-  }
+// Fancy (default) code block styling — language-colored tab with icon,
+// zebra striping, rounded block. This is what raw blocks look like unless
+// a region is wrapped in #simple-code[...].
+#let code-style(body) = {
   show: codly-init
   codly(
     languages: codly-languages,
-    zebra-fill: none,
-    display-name: false,
-    display-icon: false,
-    radius: 2pt,
+    zebra-fill: luma(246),
+    display-name: true,
+    display-icon: true,
+    radius: 5pt,
     inset: (left: 6pt, right: 6pt, top: 4pt, bottom: 4pt),
-    stroke: 0.5pt + rgb("#cccccc"),
-    fill: rgb("#fafafa"),
+    stroke: 0.8pt + luma(220),
   )
+  show raw.where(block: true): set text(font: ("Menlo", "DejaVu Sans Mono"), size: 9.5pt)
   show raw.where(block: false): it => box(
     fill: rgb("#eeeeee"),
     inset: (x: 3pt, y: 0pt),
@@ -78,205 +63,34 @@
   body
 }
 
+// Opt a region out of codly back to a plain, unstyled code block.
+// Usage: #simple-code[ ```py ... ``` ]
+#let simple-code(body) = no-codly(body)
+
+#let base-style(body) = {
+  show: _word-count
+  set text(font: "Computer Modern", size: 12pt)
+  set heading(numbering: "1.1")
+  set enum(numbering: "1.")
+  show: itmz.default-enum-list.with(indent: auto, item-spacing: auto)
+  set math.equation(numbering: none)
+  set math.mat(delim: "[", gap: 0.3em)
+  set par(justify: true)
+  set image(width: 30em)
+  show grid: it => {
+    set image(width: auto)
+    it
+  }
+  show: code-style
+  body
+}
+
 #let bib = bibliography.with(style: "chicago-author-date")
 
 #let pageSetup(body) = {
   set page(paper: "us-letter", margin: (left: 3cm, right: 3cm, top: 2cm, bottom: 2cm))
   base-style(body)
 }
-
-
-// ══════════════════════════════════════════════════════
-// CODE LANGUAGE SHORTCUTS
-// ══════════════════════════════════════════════════════
-
-#let hscode(x) = raw(x, lang: "hs")   // Haskell inline code
-#let pycode(x) = raw(x, lang: "py")   // Python inline code  (use pycode, not py — py = ∂y)
-// Legacy aliases kept for compatibility
-#let hs = hscode
-
-
-// ══════════════════════════════════════════════════════
-// MATH SHORTHANDS — general
-// ══════════════════════════════════════════════════════
-
-#let abc = enum.with(numbering: "(a)", spacing: 1.5em)
-#let evaluated(expr, size: 100%) = $lr(#expr|, size: #size)$
-#let u(x) = underline(x)
-#let b(x) = bold(x)
-#let i(x) = emph[x]
-#let yes = $checkmark$
-#let no = $crossmark$
-#let pm = $plus.minus$
-#let absurd = $bot$
-#let QED = [#h(1fr) $square$]
-#let IH = [*_IH_*]
-#let fill = [#h(1fr)]   // horizontal fill (use #fill, not #f, to avoid f-in-math clashes)
-
-// Logic / sets
-#let term(p,q) = $#p "all" #q$
-#let sent(p, q, mid: none) = if mid == none { $"All" #p #h(0.4em) #q$ } else { $"All" #p #mid #q$ }
-#let allare(p,q) = $"All" #p "are" #q$
-#let ip(x) = $[|#x|]$
-#let pow(x) = $cal(P)(#x)$
-#let psubset = $subset$
-#let subset = $subset.eq$
-#let cap = $inter$
-#let cup = $union$
-#let mid = "|"
-#let imp = $=>$
-#let iimp = $==>$
-#let bi = $<=>$
-#let bii = $<==>$
-#let ent = symbol("⊨", ("not", "⊭"))
-#let prov = symbol("⊢", ("not", "⊬"))
-#let lang = $chevron.l$
-#let rang = $chevron.r$
-#let pplus = $plus.double$
-#let ppplus = $plus.triple$
-#let model = $cal(M)$
-
-// Common abbreviations / operators
-#let def = $=^"def"$
-#let kplus = $k+1$
-#let kmin = $k-1$
-#let iplus = $i+1$
-#let imin = $i-1$
-#let nplus = $n+1$
-#let nmin = $n-1$
-#let wrt = $w.r.t$
-#let ie = $i.e.$
-#let eg = $e.g.$
-#let Der = "Der"
-#let apx = $approx$
-#let bool = [Bool]
-#let st = $s.t quad$
-#let to = $->$
-#let from = $tilde$
-#let where = $quad "where"$
-#let since = $quad "since"$
-#let given = $quad "given"$
-#let iff = $quad"if" $
-#let otherwise = $quad "otherwise"$
-#let bigo(x) = $cal(O)(#x)$
-#let smallo(x) = $cal(o)(#x)$
-#let adj(x) = $"adj"(#x)$
-#let sign(a) = $"sign"(#a)$
-#let tran(x) = $#x^sans(T)$
-#let inv(x) = $#x^sans(-1)$
-#let Astar = $A^star$
-#let pred(a) = $hat(#a)$
-#let ubar(a) = $underline(#a)$
-#let obar(a) = $overline(#a)$
-
-// Spacing helpers
-#let qquad = $quad quad$
-#let qqquad = $quad quad quad$
-#let qqqquad = $quad quad quad quad$
-
-// Coloured math
-#let redmath(x) = text(fill: red, $#x$)
-#let bluemath(x) = text(fill: blue, $#x$)
-#let greenmath(x) = text(fill: green, $#x$)
-
-// Optimisation
-#let maxi(..args) = if args.pos().len() == 0 {
-  $op("maximize")$
-} else {
-  $limits(op("maximize"))_(#args.pos().first())$
-}
-#let mini(..args) = if args.pos().len() == 0 {
-  $op("minimize")$
-} else {
-  $limits(op("minimize"))_(#args.pos().first())$
-}
-#let supremum(x) = $op("supremum", limits: #true)_(#x)$
-#let diag(x) = $"diag"(#x)$
-
-// ML / activation
-#let softmax(x) = $"softmax"(#x)$
-#let ReLU(x) = $"ReLU"(#x)$
-#let GeLU(x) = $"GeLU"(#x)$
-#let loss = $cal(L)$
-#let gauss = $cal(N)$
-
-// Big operators
-#let int(a,b,c) = $integral_(#a)^(#b) #c$
-#let prod(a,b,c) = $product_(#a)^(#b) #c$
-#let summ(a,b,c) = $sum_(#a)^(#b) #c$
-#let limm(a) = $lim_(#a)$
-
-// Common function applications
-#let fx = $f(x)$
-#let gx = $g(x)$
-#let hx = $h(x)$
-
-
-// ══════════════════════════════════════════════════════
-// CALCULUS NOTATION
-// ══════════════════════════════════════════════════════
-
-// Differentials
-#let dx = $dif x$
-#let dy = $dif y$
-#let dz = $dif z$
-#let dvar(x) = $dif #x$
-#let px = $partial x$
-#let py = $partial y$
-#let pz = $partial z$
-#let pvar(x) = $partial #x$
-
-// Ordinary derivatives
-#let ddx = $dif/(dif x)$                          // d/dx  (operator)
-#let ddy = $dif/(dif y)$                          // d/dy  (operator)
-#let ddz = $dif/(dif z)$                          // d/dz  (operator)
-#let dd(x) = $dif/(dif #x)$                       // d/d(var)  e.g. dd(t)
-#let dv(f, x) = $(dif #f)/(dif #x)$               // df/dx  e.g. dv(f,x)
-#let dvn(f, x, n) = $(dif^#n #f)/(dif #x^#n)$     // dⁿf/dxⁿ  e.g. dvn(f,x,2)
-
-// Partial derivatives
-#let ppx = $partial/(partial x)$
-#let ppy = $partial/(partial y)$
-#let ppz = $partial/(partial z)$
-#let pp(x) = $partial/(partial #x)$                            // ∂/∂(var)  e.g. pp(y)
-#let ppv(f, x) = $(partial #f)/(partial #x)$                    // ∂f/∂x  e.g. ppv(f,x)
-#let pvn(f, x, n) = $(partial^#n #f)/(partial #x^#n)$          // ∂ⁿf/∂xⁿ  e.g. pvn(f,x,2)
-#let pvm(f, x, y) = $(partial^2 #f)/(partial #x partial #y)$   // ∂²f/∂x∂y  mixed partial
-
-// Hessian
-#let hess2(f) = $mat(
-  (partial^2 #f)/(partial x^2), (partial^2 #f)/(partial x partial y);
-  (partial^2 #f)/(partial y partial x), (partial^2 #f)/(partial y^2)
-)$
-#let hess(f) = $mat(
-  (partial^2 #f)/(partial x_1^2), dots.c, (partial^2 #f)/(partial x_1 partial x_n);
-  dots.v, dots.down, dots.v;
-  (partial^2 #f)/(partial x_n partial x_1), dots.c, (partial^2 #f)/(partial x_n^2)
-)$
-
-// Gradient / Laplacian
-
-#let nf = $nabla f$         // ∇f  (shorthand constant)
-#let nnf = $nabla^2 f$      // ∇^2f  (shorthand constant)
-
-// ══════════════════════════════════════════════════════
-// SYMBOL ALIASES
-// ══════════════════════════════════════════════════════
-
-#let phi = $phi.alt$
-#let eps = $epsilon$
-#let Eps = $Epsilon$
-#let del = $delta$
-#let Del = $Delta$
-#let gam = $gamma$
-#let Gam = $Gamma$
-#let lam = $lambda$
-#let dag = $dagger$
-#let phid = $phi^dag$
-#let Gamd = $Gam^dag$
-#let var = $sigma^2$
-#let cov = $Sigma$
-
 
 // ══════════════════════════════════════════════════════
 // PROOF TREES  (curryst)
@@ -290,7 +104,10 @@
   [Conclusion],
 )
 // Pseudocode
-#let pseudo = pseudocode-list
+#let pseudo(body) = {
+  show math.equation.where(block: true): eq => block(width: 100%, align(center, eq))
+  pseudocode-list(body)
+}
 
 // ══════════════════════════════════════════════════════
 // TREES  (tidy)
@@ -299,9 +116,9 @@
   let shape-draw-node = if shape == "circle" {
     tidy-tree-draws.circle-draw-node
   } else if shape == "rect" or shape == "rectangle" {
-    ((name, label, pos)) => (shape: rect)
+    ((name, label, pos)) => (pos: (pos.x, pos.y), label: [#label], name: name, shape: rect)
   } else if shape == "square" {
-    ((name, label, pos)) => (shape: rect, width: 1.6em, height: 1.6em)
+    ((name, label, pos)) => (pos: (pos.x, pos.y), label: [#label], name: name, shape: rect, width: 1.6em, height: 1.6em)
   } else if shape == none {
     tidy-tree-draws.hidden-draw-node
   } else {
@@ -417,6 +234,14 @@
   content,
 )
 
+// purple corollary
+#let corollary(title: "Corollary", width: 100%, content) = _titled-card(
+  title: title, width: width,
+  header-fill: rgb("#6d28d9"), body-fill: rgb("#f3ecfd"),
+  border: rgb("#d8b9f2"), body-text-fill: rgb("#3b1257"),
+  content,
+)
+
 // green definition
 #let definition(title: "Definition", width: 100%, content) = _titled-card(
   title: title, width: width,
@@ -433,9 +258,43 @@
   content,
 )
 
+// white/neutral proof — same shape as example, plain color, ends with QED
+#let proof(title: "Proof", width: 100%, content) = _titled-card(
+  title: title, width: width,
+  header-fill: rgb("#4b5563"), body-fill: white,
+  border: rgb("#d1d5db"), body-text-fill: rgb("#1f2937"),
+  [#content #QED],
+)
+
+// inline typst logo
+#let typst = {
+  set text(
+    size: 1.05em,
+    font: "Buenard",
+    weight: "bold",
+    fill: rgb("#239dad"),
+  )
+  box({
+    text("t")
+    text("y")
+    h(0.035em)
+    text("p")
+    h(-0.025em)
+    text("s")
+    h(-0.015em)
+    text("t")
+  })
+}
+
 
 // ══════════════════════════════════════════════════════
 // DOCUMENT TEMPLATES
+//
+// All cover pages accept an optional `logo:` parameter (image content,
+// e.g. `image("logo.png", width: 15em)`). Left as `none` by default so
+// this package carries no institutional branding — pass your own logo
+// from the calling document, or wrap these templates with your
+// institution's defaults in your own package.
 // ══════════════════════════════════════════════════════
 
 #let default-title  = "Untitled Document"
@@ -446,9 +305,11 @@
 // ── note ─────────────────────────────────────────────
 #let note(
   title: default-title,
+  subtitle: none,
   author: default-author,
   course: default-course,
   date: default-date,
+  logo: none,
   outline: true,
   outline-depth: none,
   ..args,
@@ -464,6 +325,9 @@
       text(size: 9.5pt, fill: rgb("#2c5aa0"), tracking: 2.5pt, weight: "bold")[LECTURE NOTES],
       v(2.5cm),
       text(size: 30pt, weight: "bold")[#title],
+      if subtitle != none {
+        stack(v(1em), text(size: 14pt, fill: rgb("#444444"), style: "italic")[#subtitle])
+      },
       v(1.3em),
       line(length: 28%, stroke: 0.5pt + rgb("#bbbbbb")),
       v(0.7em),
@@ -472,8 +336,7 @@
       text(size: 12pt)[#_fmt-authors(author)],
       v(0.3em),
       text(size: 11pt, fill: rgb("#888888"))[#date],
-      v(1.8em),
-      image("IMADA_en.png", width: 15em),
+      if logo != none { stack(v(1.8em), logo) },
       v(1cm),
     )
   )
@@ -488,6 +351,7 @@
   author: default-author,
   course: default-course,
   date: default-date,
+  logo: none,
   outline: true,
   outline-depth: none,
   ..args,
@@ -511,8 +375,7 @@
       text(size: 12pt)[#_fmt-authors(author)],
       v(0.3em),
       text(size: 11pt, fill: rgb("#888888"))[#date],
-      v(1.8em),
-      image("IMADA_en.png", width: 15em),
+      if logo != none { stack(v(1.8em), logo) },
       v(1cm),
     )
   )
@@ -527,6 +390,7 @@
   author: default-author,
   course: default-course,
   date: default-date,
+  logo: none,
   outline: true,
   outline-depth: none,
   ..args,
@@ -550,8 +414,7 @@
       text(size: 12pt)[#_fmt-authors(author)],
       v(1.8em),
       text(size: 11pt, fill: rgb("#888888"))[#date],
-      v(1.8em),
-      image("IMADA_en.png", width: 15em),
+      if logo != none { stack(v(1.8em), logo) },
       v(1cm),
     )
   )
@@ -569,7 +432,8 @@
   date: default-date,
   group: none,
   supervisor: none,
-  university: "University of Southern Denmark",
+  university: "University",
+  logo: none,
   abstract: none,
   keywords: none,
   outline: true,
@@ -676,8 +540,7 @@
           ),
         )
       },
-      v(1.8em),
-      image("IMADA_en.png", width: 15em),
+      if logo != none { stack(v(1.8em), logo) },
       v(1cm),
     )
   )
@@ -698,7 +561,8 @@
   student-number: none,
   duration: none,
   allowed-aids: none,
-  university: "University of Southern Denmark",
+  university: "University",
+  logo: none,
   outline: true,
   outline-depth: none,
   ..args,
@@ -791,13 +655,100 @@
             text(fill: rgb("#777777"))[*Date:*], text()[#date]),
         ))
       ),
-      v(1.8em),
-      image("IMADA_en.png", width: 15em),
+      if logo != none { stack(v(1.8em), logo) },
       v(1cm),
     )
   )
   pagebreak()
   if outline { std.outline(depth: outline-depth); pagebreak() }
+  base-style(body)
+}
+
+// ── chi — ACM CHI paper ──────────────────────────────
+#let chi(
+  title: default-title,
+  authors: (),
+  abstract: [],
+  keywords: (),
+  ccs: none,
+  date: default-date,
+  outline: false,
+  ..args,
+) = {
+  let body = args.pos().at(0, default: [])
+  set page(paper: "us-letter", margin: (x: 1.9cm, y: 2.3cm))
+  set text(size: 9.5pt)
+
+  v(0.5cm)
+  align(center, text(size: 18pt, weight: "bold")[#title])
+  v(1.5em)
+
+  let authors-arr = if type(authors) == str {
+    ((name: authors),)
+  } else if authors.len() > 0 and type(authors.at(0)) == str {
+    authors.map(n => (name: n))
+  } else {
+    authors
+  }
+  if authors-arr.len() > 0 {
+    let render-author(a) = align(center, stack(
+      spacing: 0.3em,
+      text(weight: "bold", size: 10.5pt)[#a.at("name", default: "")],
+      if a.at("institution", default: "") != "" { text(size: 9pt)[#a.at("institution", default: "")] },
+      if a.at("city", default: "") != "" or "country" in a {
+        text(size: 9pt)[#a.at("city", default: "")#if "country" in a [, #a.country]]
+      },
+      if a.at("email", default: "") != "" {
+        text(size: 9pt, fill: rgb("#0055aa"))[#a.at("email", default: "")]
+      },
+    ))
+
+    let n = authors-arr.len()
+    let row-starts = range(0, n, step: 3)
+    for i in row-starts {
+      let row = authors-arr.slice(i, calc.min(i + 3, n))
+      align(center,
+        box(width: (100% * row.len() / 3),
+          grid(columns: (1fr,) * row.len(), column-gutter: 2em,
+            ..row.map(render-author))
+        )
+      )
+      if i + 3 < n { v(1.5em) }
+    }
+
+    v(1.8em)
+    align(center, text(size: 9pt, fill: rgb("#888888"))[#date])
+    v(1em)
+  }
+
+  let has-meta = abstract != [] or keywords != () or ccs != none
+  if has-meta {
+    line(length: 100%, stroke: 0.5pt + rgb("#888888"))
+    v(1em)
+    columns(2, gutter: 1.5em, [
+      #if abstract != [] {
+        text(weight: "bold", size: 8.5pt, tracking: 0.8pt)[ABSTRACT]
+        v(0.4em)
+        abstract
+      }
+      #if ccs != none {
+        v(0.8em)
+        text(weight: "bold", size: 8.5pt, tracking: 0.8pt)[CCS CONCEPTS]
+        v(0.4em)
+        ccs
+      }
+      #if keywords != () {
+        v(0.8em)
+        text(weight: "bold", size: 8.5pt, tracking: 0.8pt)[KEYWORDS]
+        v(0.4em)
+        keywords.join("; ")
+      }
+    ])
+  }
+
+  line(length: 100%, stroke: 0.5pt + rgb("#888888"))
+  v(1em)
+  if outline { pagebreak(); std.outline(); pagebreak() }
   base-style(body)
 }
 
@@ -807,12 +758,13 @@ TEMPLATES — copy the block you need into a new file
 =============================================================
 
 ── NOTE ──────────────────────────────────────────────────────
-#import "../../temp.typ": *
+#import "@preview/sdust:0.1.0": *
 #show: note.with(
   title:         "Lecture Notes",
   course:        "DM000 — Course Name",
   author:        "Firstname Lastname",
   date:          "date",
+  logo:          image("logo.png", width: 15em),   // optional
   outline:       true,          // set false to skip TOC
   outline-depth: 2,             // none = unlimited depth
 )
@@ -821,7 +773,7 @@ TEMPLATES — copy the block you need into a new file
 Content goes here.
 
 ── EXERCISE ──────────────────────────────────────────────────
-#import "../../temp.typ": *
+#import "@preview/sdust:0.1.0": *
 #show: exercise.with(
   title:         "Exercises 1",
   course:        "DM000 — Course Name",
@@ -835,7 +787,7 @@ Content goes here.
 Content goes here.
 
 ── ASSIGNMENT ────────────────────────────────────────────────
-#import "../../temp.typ": *
+#import "@preview/sdust:0.1.0": *
 #show: assignment.with(
   title:         "Assignment 1",
   course:        "DM000 — Course Name",
@@ -849,7 +801,7 @@ Content goes here.
 Content goes here.
 
 ── EXAM ──────────────────────────────────────────────────────
-#import "../../temp.typ": *
+#import "@preview/sdust:0.1.0": *
 #show: exam.with(
   title:         "Written Exam",
   subtitle:      "Re-exam",                    // optional
@@ -868,25 +820,8 @@ Content goes here.
 = Problem 1
 Content goes here.
 
-── EXAM (group / multiple students) ─────────────────────────
-#import "../../temp.typ": *
-#show: exam.with(
-  title:        "Written Exam",
-  course:       "DM000 — Course Name",
-  author: (
-    (name: "Firstname Lastname", id: "id"),
-    (name: "Firstname Lastname", id: "id"),
-  ),
-  date:         "June 2026",
-  duration:     "4 hours",
-  allowed-aids: "None",
-)
-
-= Problem 1
-Content goes here.
-
 ── PROJECT ───────────────────────────────────────────────────
-#import "../../temp.typ": *
+#import "@preview/sdust:0.1.0": *
 #show: project.with(
   title:         "Project Title",
   subtitle:      "Optional subtitle",          // optional
@@ -895,7 +830,7 @@ Content goes here.
   date:          "date",
   group:         "Group 4",                    // optional
   supervisor:    "Prof. Firstname Lastname",   // optional
-  university:    "University of Southern Denmark",
+  university:    "University",
   outline:       true,
   outline-depth: 2,
 )
@@ -903,19 +838,18 @@ Content goes here.
 = Introduction
 Content goes here.
 
-── PROJECT (multiple authors with email) ─────────────────────
-#import "../../temp.typ": *
-#show: project.with(
-  title:  "Project Title",
-  course: "DM000 — Course Name",
-  author: (
-    (name: "Firstname Lastname", email: "mail@mail.com"),
-    (name: "Firstname Lastname", email: "mail@mail.com"),
+── CHI PAPER ─────────────────────────────────────────────────
+#import "@preview/sdust:0.1.0": *
+#show: chi.with(
+  title: "Paper Title",
+  authors: (
+    (name: "Firstname Lastname", institution: "University", city: "City", country: "County", email: "mail@mail.com"),
   ),
-  date:       "date",
-  group:      "Group no.",
-  supervisor: "Prof. Firstname Lastname",
+  abstract: [Your abstract text here.],
+  keywords: ("keyword one", "keyword two"),
+  date:     "date",
 )
+#set page(columns: 2)
 
 = Introduction
 Content goes here.

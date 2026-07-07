@@ -1,4 +1,11 @@
 [package]
-name = "sdu-notes"
+name = "sdust"
 version = "0.1.0"
 entrypoint = "lib.typ"
+authors = ["Simon Holm"]
+license = "MIT"
+description = "Document templates (notes, exercises, exams, projects, papers) and theorem-style blocks for academic Typst documents."
+repository = "https://github.com/simo899t/sdust"
+keywords = ["template", "notes", "theorem", "academic", "university"]
+categories = ["office", "layout"]
+exclude = ["README.md"]
