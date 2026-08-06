@@ -16,6 +16,7 @@
 #import "@preview/codly-languages:0.1.10": codly-languages
 #import "@preview/fletcher:0.5.7" as fletcher: diagram, node, edge
 #import "@preview/itemize:0.2.0" as itmz
+#import "@preview/mitex:0.2.7": mitex
 #let dirgraph(src) = h-graph(src, polar-render)
 
 // simple node/edge graph, e.g.
@@ -33,6 +34,36 @@
   ),
   caption: caption,
 )
+
+// renders raw LaTeX math directly, e.g.
+// #tex[\int_a^b f(x)\,dx = F(b) - F(a)]
+#let tex(body) = mitex(body)
+
+// simple list-format diagram maker (UML class/flow diagrams), e.g.
+// #uml(
+//   nodes: ("Client", "Server", "Database"),
+//   edges: (("Client", "Server", "request"), ("Server", "Database", "query")),
+// )
+// #let uml(nodes: (), edges: (), cols: 3, spacing: 3em, shape: "rect", inset: 8pt, arrow: "->", caption: none) = {
+//   let pos-of(i) = (calc.rem(i, cols), calc.quo(i, cols))
+//   let index-of = (:)
+//   for (i, n) in nodes.enumerate() { index-of.insert(n, i) }
+//   figure(
+//     diagram(
+//       node-stroke: 1pt,
+//       edge-stroke: 1pt,
+//       spacing: spacing,
+//       ..nodes.enumerate().map(((i, n)) => node(pos-of(i), n, shape: shape, inset: inset)),
+//       ..edges.map(e => edge(
+//         pos-of(index-of.at(e.at(0))),
+//         pos-of(index-of.at(e.at(1))),
+//         marks: e.at(3, default: arrow),
+//         label: e.at(2, default: none),
+//       )),
+//     ),
+//     caption: caption,
+//   )
+// }
 
 
 // ══════════════════════════════════════════════════════
@@ -334,6 +365,7 @@
   z: auto,
   grid: 12,
   k: 0.6,
+  axis-label-offset: (0.06, 0.04, 0.03),
   ..args,
 ) = {
   let f = _as-fn(f, ("x", "y"))
@@ -367,6 +399,7 @@
     ydomain: y,
     scale-dim: default-scale-dim,
     axis-step: default-axis-step,
+    axis-label-offset: axis-label-offset,
     ..args,
   )
 }
