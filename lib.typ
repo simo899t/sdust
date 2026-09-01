@@ -11,7 +11,7 @@
 #import "@preview/tdtr:0.5.2" : *
 #import "@preview/h-graph:0.1.0": *
 #import "@preview/cetz:0.3.4": canvas, draw
-#import "@preview/curryst:0.6.0": rule, prooftree, rule-set
+#import "@preview/curryst:0.6.0": rule, prooftree
 #import "@preview/codly:1.3.0": codly, codly-init, no-codly
 #import "@preview/codly-languages:0.1.10": codly-languages
 #import "@preview/fletcher:0.5.7" as fletcher: diagram, node, edge
@@ -39,33 +39,6 @@
 // #tex[\int_a^b f(x)\,dx = F(b) - F(a)]
 #let tex(body) = mitex(body)
 
-// simple list-format diagram maker (UML class/flow diagrams), e.g.
-// #uml(
-//   nodes: ("Client", "Server", "Database"),
-//   edges: (("Client", "Server", "request"), ("Server", "Database", "query")),
-// )
-// #let uml(nodes: (), edges: (), cols: 3, spacing: 3em, shape: "rect", inset: 8pt, arrow: "->", caption: none) = {
-//   let pos-of(i) = (calc.rem(i, cols), calc.quo(i, cols))
-//   let index-of = (:)
-//   for (i, n) in nodes.enumerate() { index-of.insert(n, i) }
-//   figure(
-//     diagram(
-//       node-stroke: 1pt,
-//       edge-stroke: 1pt,
-//       spacing: spacing,
-//       ..nodes.enumerate().map(((i, n)) => node(pos-of(i), n, shape: shape, inset: inset)),
-//       ..edges.map(e => edge(
-//         pos-of(index-of.at(e.at(0))),
-//         pos-of(index-of.at(e.at(1))),
-//         marks: e.at(3, default: arrow),
-//         label: e.at(2, default: none),
-//       )),
-//     ),
-//     caption: caption,
-//   )
-// }
-
-
 // ══════════════════════════════════════════════════════
 // BASE STYLE
 // ══════════════════════════════════════════════════════
@@ -78,10 +51,18 @@
   codly(
     languages: codly-languages,
     zebra-fill: luma(246),
+    // display-name/display-icon disabled: codly's line-1 badge sits in a
+    // two-column grid whose code-text column is supposed to stretch to fill
+    // available width but instead shrinks to the width of the longest
+    // unbreakable chunk of text on that line — confirmed via direct
+    // measurement (huge unused whitespace next to a wrapped first line).
+    // Reproduces specifically in this document's exact combination of
+    // note()'s leading pagebreak + word-count + codly, independent of any
+    // codly parameter (inset, radius, stroke) we tried. No reliable config
+    // fix found; disabling the badge is the only variant that never wraps.
     display-name: true,
     display-icon: true,
     radius: 5pt,
-    inset: (left: 6pt, right: 6pt, top: 4pt, bottom: 4pt),
     stroke: 0.8pt + luma(220),
   )
   show raw.where(block: true): set text(font: ("Menlo", "DejaVu Sans Mono"), size: 9.5pt)
@@ -101,13 +82,16 @@
 
 #let base-style(body) = {
   show: _word-count
+  // Centered "current/total" page number in the footer of every page.
+  set page(numbering: "1/1", number-align: center)
   set text(font: "Computer Modern", size: 12pt)
   set heading(numbering: "1.1")
   set enum(numbering: "1.a)")
   show: itmz.default-enum-list.with(indent: auto, item-spacing: auto)
   set math.equation(numbering: none)
   set math.mat(delim: "[", gap: 0.3em)
-  set par(justify: true)
+  // 1.5 line spacing.
+  set par(justify: true, leading: 0.65em)
   set image(width: 30em)
   show grid: it => {
     set image(width: auto)
@@ -124,18 +108,23 @@
   base-style(body)
 }
 
-// ══════════════════════════════════════════════════════
-// PROOF TREES  (curryst)
-// ══════════════════════════════════════════════════════
-#let prooftree = rule(
-  label: [Label],
-  name: [Rule name],
-  [Premise 1],
-  [Premise 2],
-  [Premise 3],
-  [Conclusion],
-)
-// Pseudocode
+// proof tree (curryst), e.g.
+// #prooftree(rule(
+//   label: [Label],
+//   name: [Rule name],
+//   [Premise 1],
+//   [Premise 2],
+//   [Conclusion],
+// ))
+
+// pseudocode block, e.g.
+// #pseudo(pseudocode(
+//   [*if* $x > 0$],
+//   ind, [return $x$], ded,
+//   [*else*],
+//   ind, [return $-x$],
+// ))
+
 #let pseudo(body) = {
   show math.equation.where(block: true): eq => block(width: 100%, align(center, eq))
   pseudocode-list(body)
@@ -144,8 +133,12 @@
 // ══════════════════════════════════════════════════════
 // TREES  (tidy)
 // ══════════════════════════════════════════════════════
-#let tree(body, reverse: false, shape: "circle", draw-node: none, ..args) = {
-  let shape-draw-node = if shape == "circle" {
+// `edges`: "straight" (default) draws direct diagonal arrows between nodes.
+//          "square" / "orthogonal" / "elbow" draws right-angled connector
+//          lines (horizontal-then-vertical) like a classic file/AST tree.
+// `draw-edge`: pass a custom tdtr draw-edge function to override `edges`.
+#let tree(body, reverse: false, shape: "circle", edges: "straight", draw-node: none, draw-edge: none, ..args) = {
+  let shape-draw-node = if shape == "circle" or shape == "circ" {
     tidy-tree-draws.circle-draw-node
   } else if shape == "rect" or shape == "rectangle" {
     ((name, label, pos)) => (pos: (pos.x, pos.y), label: [#label], name: name, shape: rect)
@@ -162,7 +155,14 @@
   } else {
     effective-draw-node
   }
-  tidy-tree-graph(body, draw-node: draw-nodes, ..args)
+  let effective-draw-edge = if draw-edge != none {
+    draw-edge
+  } else if edges == "square" or edges == "orthogonal" or edges == "elbow" {
+    tidy-tree-draws.horizontal-vertical-draw-edge
+  } else {
+    tidy-tree-draws.default-draw-edge
+  }
+  tidy-tree-graph(body, draw-node: draw-nodes, draw-edge: effective-draw-edge, ..args)
 }
 
 
@@ -171,8 +171,8 @@
 // ══════════════════════════════════════════════════════
 
 #let _fmt-authors(author) = {
-  if type(author) == str { author }
-  else { author.join(" · ") }
+  if type(author) == array { author.join(" · ") }
+  else { author }
 }
 
 #let group-by-pairs(elements) = {
@@ -186,22 +186,6 @@
     .map(((_, element)) => element)
   lefts.zip(rights)
 }
-
-// Cases helper: alternating value/condition pairs.
-// #mycases($x$, $x > 0$, $-x$, $x <= 0$)
-// Optional word: prefix for conditions (e.g. word: "if")
-#let mycases(..cases, word: none) = {
-  let cases = group-by-pairs(cases.pos())
-    .map(((value, condition)) => {
-      if word != none {
-        $#value quad &#word #condition$
-      } else {
-        $#value quad & #condition$
-      }
-    })
-  math.cases(..cases)
-}
-
 
 // ══════════════════════════════════════════════════════
 // PLOTTING
@@ -451,7 +435,7 @@
   },
 )
 
-// gray default block
+// gray default block, e.g. #block(title: "Note")[Body text.]
 #let block(title: none, width: 100%, content) = _titled-card(
   title: title, width: width,
   header-fill: rgb("#6b7280"), body-fill: rgb("#f3f4f6"),
@@ -459,7 +443,7 @@
   content,
 )
 
-// blue theorem
+// blue theorem, e.g. #theorem(title: "Theorem 1")[For all $x$, ...]
 #let theorem(title: "Theorem", width: 100%, content) = _titled-card(
   title: title, width: width,
   header-fill: rgb("#1565c0"), body-fill: rgb("#ecf3fc"),
@@ -467,7 +451,7 @@
   content,
 )
 
-// purple corollary
+// purple corollary, e.g. #corollary[Follows directly from Theorem 1.]
 #let corollary(title: "Corollary", width: 100%, content) = _titled-card(
   title: title, width: width,
   header-fill: rgb("#6d28d9"), body-fill: rgb("#f3ecfd"),
@@ -475,7 +459,7 @@
   content,
 )
 
-// green definition
+// green definition, e.g. #definition(title: "Definition (Group)")[A set $G$ with ...]
 #let definition(title: "Definition", width: 100%, content) = _titled-card(
   title: title, width: width,
   header-fill: rgb("#2e7d32"), body-fill: rgb("#ecfdf5"),
@@ -483,7 +467,7 @@
   content,
 )
 
-// red example
+// red example, e.g. #example[Let $x = 2$, then ...]
 #let example(title: "Example", width: 100%, content) = _titled-card(
   title: title, width: width,
   header-fill: rgb("#c62828"), body-fill: rgb("#fdeced"),
@@ -491,33 +475,17 @@
   content,
 )
 
-// white/neutral proof — same shape as example, plain color, ends with QED
+// end-of-proof tombstone symbol
+#let QED = h(1fr) + box(width: 0.6em, height: 0.6em, stroke: 0.8pt + black)
+
+// white/neutral proof — same shape as example, plain color, ends with QED,
+// e.g. #proof[By induction on $n$. ...]
 #let proof(title: "Proof", width: 100%, content) = _titled-card(
   title: title, width: width,
   header-fill: rgb("#4b5563"), body-fill: white,
   border: rgb("#d1d5db"), body-text-fill: rgb("#1f2937"),
-  [#content #QED],
+  [],
 )
-
-// inline typst logo
-#let typst = {
-  set text(
-    size: 1.05em,
-    font: "Buenard",
-    weight: "bold",
-    fill: rgb("#239dad"),
-  )
-  box({
-    text("t")
-    text("y")
-    h(0.035em)
-    text("p")
-    h(-0.025em)
-    text("s")
-    h(-0.015em)
-    text("t")
-  })
-}
 
 
 // ══════════════════════════════════════════════════════
@@ -525,7 +493,7 @@
 //
 // All cover pages accept an optional `logo:` parameter (image content,
 // e.g. `image("logo.png", width: 15em)`). Left as `none` by default so
-// this package carries no institutional branding — pass your own logo
+// this package carries no institutional branding, one can pass own logo
 // from the calling document, or wrap these templates with your
 // institution's defaults in your own package.
 // ══════════════════════════════════════════════════════
@@ -540,6 +508,7 @@
   title: default-title,
   subtitle: none,
   author: default-author,
+  supervisor: none,
   course: default-course,
   date: default-date,
   logo: none,
@@ -567,6 +536,11 @@
       text(size: 14pt, fill: rgb("#444444"))[#course],
       v(1fr),
       text(size: 12pt)[#_fmt-authors(author)],
+      if supervisor != none {
+        stack(v(0.4em), text(size: 10pt, fill: rgb("#666666"))[
+          Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]: #_fmt-authors(supervisor)
+        ])
+      },
       v(0.3em),
       text(size: 11pt, fill: rgb("#888888"))[#date],
       if logo != none { stack(v(1.8em), logo) },
@@ -582,6 +556,7 @@
 #let exercise(
   title: default-title,
   author: default-author,
+  supervisor: none,
   course: default-course,
   date: default-date,
   logo: none,
@@ -606,6 +581,11 @@
       text(size: 14pt, fill: rgb("#444444"))[#course],
       v(1fr),
       text(size: 12pt)[#_fmt-authors(author)],
+      if supervisor != none {
+        stack(v(0.4em), text(size: 10pt, fill: rgb("#666666"))[
+          Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]: #_fmt-authors(supervisor)
+        ])
+      },
       v(0.3em),
       text(size: 11pt, fill: rgb("#888888"))[#date],
       if logo != none { stack(v(1.8em), logo) },
@@ -621,6 +601,7 @@
 #let assignment(
   title: default-title,
   author: default-author,
+  supervisor: none,
   course: default-course,
   date: default-date,
   logo: none,
@@ -645,6 +626,11 @@
       text(size: 14pt, fill: rgb("#444444"))[#course],
       v(1fr),
       text(size: 12pt)[#_fmt-authors(author)],
+      if supervisor != none {
+        stack(v(0.4em), text(size: 10pt, fill: rgb("#666666"))[
+          Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]: #_fmt-authors(supervisor)
+        ])
+      },
       v(1.8em),
       text(size: 11pt, fill: rgb("#888888"))[#date],
       if logo != none { stack(v(1.8em), logo) },
@@ -736,7 +722,8 @@
           },
           if supervisor != none {
             grid(columns: (4cm, 1fr),
-              text(fill: rgb("#777777"))[*Supervisor:*], text()[#supervisor])
+              text(fill: rgb("#777777"))[*Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]:*],
+              text()[#_fmt-authors(supervisor)])
           },
           grid(columns: (4cm, 1fr),
             text(fill: rgb("#777777"))[*Date:*], text()[#date]),
@@ -782,6 +769,58 @@
   base-style(body)
 }
 
+// ── submission ───────────────────────────────────────
+// Like #project, but no frontpage/outline — just the title card,
+// then straight into the body content.
+#let submission(
+  title: default-title,
+  subtitle: none,
+  author: none,
+  supervisor: none,
+  institution: "University",
+  date: default-date,
+  logo: none,
+  ..args,
+) = {
+  let body = args.pos().at(0, default: [])
+  set page(paper: "us-letter", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
+  align(center,
+    stack(
+      spacing: 0pt,
+      text(size: 28pt, weight: "bold")[#title],
+      if subtitle != none {
+        stack(v(1.5em), text(size: 15pt, fill: rgb("#444444"), style: "italic")[#subtitle])
+      },
+      v(2em),
+      std.block(
+        width: 70%,
+        stroke: (top: 0.5pt + rgb("#aaaaaa"), bottom: 0.5pt + rgb("#aaaaaa")),
+        inset: (top: 1em, bottom: 1em),
+        align(left, stack(
+          spacing: 1.5em,
+          if author != none {
+            grid(columns: (4cm, 1fr),
+              text(fill: rgb("#777777"))[*Author#if type(author) == array and author.len() > 1 [s]:*],
+              text()[#_fmt-authors(author)])
+          },
+          if supervisor != none {
+            grid(columns: (4cm, 1fr),
+              text(fill: rgb("#777777"))[*Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]:*],
+              text()[#_fmt-authors(supervisor)])
+          },
+          grid(columns: (4cm, 1fr),
+            text(fill: rgb("#777777"))[*Date:*], text()[#date]),
+          grid(columns: (4cm, 1fr),
+            text(fill: rgb("#777777"))[*Institution:*], text()[#institution]),
+        ))
+      ),
+      if logo != none { stack(v(1.8em), logo) },
+      v(1cm),
+    )
+  )
+  base-style(body)
+}
+
 // ── exam ─────────────────────────────────────────────
 #let exam(
   title: default-title,
@@ -794,6 +833,7 @@
   student-number: none,
   duration: none,
   allowed-aids: none,
+  supervisor: none,
   university: "University",
   logo: none,
   outline: true,
@@ -883,6 +923,11 @@
           if allowed-aids != none {
             grid(columns: (4cm, 1fr),
               text(fill: rgb("#777777"))[*Allowed aids:*], text()[#allowed-aids])
+          },
+          if supervisor != none {
+            grid(columns: (4cm, 1fr),
+              text(fill: rgb("#777777"))[*Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]:*],
+              text()[#_fmt-authors(supervisor)])
           },
           grid(columns: (4cm, 1fr),
             text(fill: rgb("#777777"))[*Date:*], text()[#date]),
@@ -1066,6 +1111,20 @@ Content goes here.
   university:    "University",
   outline:       true,
   outline-depth: 2,
+)
+
+= Introduction
+Content goes here.
+
+── SUBMISSION ────────────────────────────────────────────────
+#import "@preview/sdust:0.1.0": *
+#show: submission.with(
+  title:         "Submission Title",
+  subtitle:      "Optional subtitle",          // optional
+  author:        "Firstname Lastname",         // or array of dicts, see #project
+  supervisor:    "Prof. Firstname Lastname",   // optional, string or array
+  institution:   "University",
+  date:          "date",
 )
 
 = Introduction
