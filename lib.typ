@@ -17,7 +17,6 @@
 #import "@preview/fletcher:0.5.7" as fletcher: diagram, node, edge
 #import "@preview/itemize:0.2.0" as itmz
 #import "@preview/mitex:0.2.7": mitex
-#let dirgraph(src) = h-graph(src, polar-render)
 
 // simple node/edge graph, e.g.
 // #graph(
@@ -484,7 +483,7 @@
   title: title, width: width,
   header-fill: rgb("#4b5563"), body-fill: white,
   border: rgb("#d1d5db"), body-text-fill: rgb("#1f2937"),
-  [],
+  [#content #QED],
 )
 
 

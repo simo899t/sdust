@@ -2,10 +2,14 @@
 name = "sdust"
 version = "0.1.0"
 entrypoint = "lib.typ"
-authors = ["Simon Holm"]
+authors = ["Simon Holm (@simo899t)"]
 license = "MIT"
-description = "Document templates (notes, exercises, exams, projects, papers) and theorem-style blocks for academic Typst documents."
+description = "Academic templates (notes, exercises, exams, projects) plus theorem-style blocks."
 repository = "https://github.com/simo899t/sdust"
+homepage = "https://github.com/simo899t/sdust"
 keywords = ["template", "notes", "theorem", "academic", "university"]
-categories = ["office", "layout"]
-exclude = ["README.md"]
+categories = ["report", "thesis", "components"]
+disciplines = ["education", "computer-science", "mathematics"]
+# TODO: verify the true minimum — cetz 0.3.4 / fletcher 0.5.7 need at least this.
+compiler = "0.13.0"
+exclude = ["test.typ", "tests/**", ".DS_Store", "CHANGELOG.md"]
