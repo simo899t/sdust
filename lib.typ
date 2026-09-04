@@ -85,7 +85,7 @@
   set page(numbering: "1/1", number-align: center)
   set text(font: "Computer Modern", size: 12pt)
   set heading(numbering: "1.1")
-  set enum(numbering: "1.a)")
+  set enum(numbering: "1.", full: true)
   show: itmz.default-enum-list.with(indent: auto, item-spacing: auto)
   set math.equation(numbering: none)
   set math.mat(delim: "[", gap: 0.3em)
@@ -386,6 +386,31 @@
     ..args,
   )
 }
+
+// ══════════════════════════════════════════════════════
+// EXERCISE CARDS
+// ══════════════════════════════════════════════════════
+#let question(title: none, body) = block(
+  width: 100%,
+  inset: 10pt,
+  radius: 4pt,
+  fill: luma(245),
+  [
+    #if title != none {
+      strong(title)
+      h(0.5em)
+    }
+    #body
+  ],
+)
+
+
+#let answer(body) = block(
+  width: 100%,
+  inset: (left: 10pt, right: 10pt, top: 4pt, bottom: 10pt),
+  stroke: (left: 1pt + luma(180)),
+  body,
+)
 
 // ══════════════════════════════════════════════════════
 // CARD COMPONENTS

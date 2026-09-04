@@ -7,3 +7,11 @@
   outline:       true,
   outline-depth: 2,
 )
+
+#question(title: "")[
+  Test
+] 
+
+#answer[
+  Test
+]
