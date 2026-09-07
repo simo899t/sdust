@@ -73,7 +73,7 @@ Windows: `%APPDATA%\typst\packages\local`. Then import `@local/sdust:0.1.0`.)
 | `exam` | Exam submissions |
 | `chi` | ACM CHI paper format |
 
-Also exported: `base-style`, `code-style`, `simple-code`, `bib`,
+Also exported: `base-style`, `bib`,
 `word-count` / `total-words`, the branding constants `sdu-red` and
 `sdu-university`, and the Faculty of Science department names
 `imada`, `bmb`, `biology`, `fkf` (pass one as `department:` on `thesis`).
@@ -84,7 +84,14 @@ Also exported: `base-style`, `code-style`, `simple-code`, `bib`,
 tombstone too), plus the exercise cards `question` / `answer` — coloured
 titled cards, e.g. `#theorem(title: "Theorem 1")[...]`.
 
-## Plotting and other helpers
+## Plotting, code styling, and other helpers
 
-`plot2d` / `plot3d` / `formula`, `tree`, `pseudo`, `graph`, `tex` live in
-[utilst](https://github.com/simo899t/utilst).
+`plot2d` / `plot3d` / `formula`, `tree`, `pseudo`, `graph`, `tex`, and the
+`code-style` / `simple-code` code-block styling (codly) live in
+[utilst](https://github.com/simo899t/utilst). Add fancy code blocks to an
+sdust document with:
+
+```typst
+#import "@preview/utilst:0.1.0": code-style
+#show: code-style
+```

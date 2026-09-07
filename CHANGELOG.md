@@ -28,6 +28,11 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `plot2d` / `plot3d` / `formula` / `tree` / `pseudo` / `graph` / `tex`
   helpers moved to the new **`utilst`** package. Theorem-style cards and
   `question` / `answer` stayed here.
+- `code-style` / `simple-code` (codly code-block styling) moved to
+  **`utilst`**. `base-style` no longer styles raw blocks — add
+  `#show: code-style` from utilst if you want it. Drops the `codly` and
+  `codly-languages` dependencies; sdust now needs only `wordometer` and
+  `itemize`.
 
 ### Fixed
 - `proof` block dropped its body (passed an empty `[]` to the card helper);

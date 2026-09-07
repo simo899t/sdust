@@ -1,7 +1,7 @@
 // This package includes 8 document templates for Typst. These templates include "Thesis, Note, Exercise, Assignment, Exam, Project, Submission and Chi" templates.
 // Each template takes inputs like "title", "author" and "supervisor" and automatically creates page-setup, frontpage, and outline
 // The sdust package also provides several types of blocks, including theorem, definition, and proof blocks, as well as question and answer blocks.
-// Cover pages render no logo by default. The SDU logo is a controlled brand asset and is not bundled — pass your own with `logo: image("sdu-logo.png", width: 12em)`.
+// Cover pages render no university/department logo by default. Pass your own with `logo: image("sdu-logo.png", width: 12em)`.
 
 // ══════════════════════════════════════════════════════
 // IMPORTS
@@ -10,8 +10,6 @@
 #import "@preview/wordometer:0.1.5": word-count as _word-count, total-words as totalwords
 #let word-count = _word-count
 #let total-words = totalwords
-#import "@preview/codly:1.3.0": codly, codly-init, no-codly
-#import "@preview/codly-languages:0.1.10": codly-languages
 #import "@preview/itemize:0.2.0" as itmz
 
 // ══════════════════════════════════════════════════════
@@ -37,31 +35,9 @@
 // BASE STYLE
 // ══════════════════════════════════════════════════════
 
-// codely code is swapped as default code in sdust use #simple-code[```py ... ```] for regular
-#let code-style(body) = {
-  show: codly-init
-  codly(
-    languages: codly-languages,
-    zebra-fill: luma(246),
-    display-name: true,
-    display-icon: true,
-    radius: 5pt,
-    stroke: 0.8pt + luma(220),
-  )
-  show raw.where(block: true): set text(font: "DejaVu Sans Mono", size: 9.5pt)
-  show raw.where(block: false): it => box(
-    fill: rgb("#eeeeee"),
-    inset: (x: 3pt, y: 0pt),
-    outset: (y: 3pt),
-    radius: 2pt,
-    text(fill: rgb("#1c1e26"), font: ("DejaVu Sans Mono", "DejaVu Sans Mono"), size: 9pt, it),
-  )
-  body
-}
-
-// Opt a region out of codly back to a plain, unstyled code block.
-// Usage: #simple-code[```py ... ```]
-#let simple-code(body) = no-codly(body)
+// Fancy code-block styling (codly) lives in the `utilst` package:
+//   #import "@preview/utilst:0.1.0": code-style
+//   #show: code-style
 
 #let base-style(body) = {
   show: _word-count
@@ -80,7 +56,6 @@
     set image(width: auto)
     it
   }
-  show: code-style
   body
 }
 
