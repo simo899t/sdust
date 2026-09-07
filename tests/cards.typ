@@ -1,5 +1,5 @@
 #import "@local/sdust:0.1.0": *
-#show: pageSetup
+#show: page-setup
 = Cards
 #theorem(title: "Thm")[$x=x$]
 #definition(title: "Def")[thing]
