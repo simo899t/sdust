@@ -4,12 +4,11 @@ version = "0.1.0"
 entrypoint = "lib.typ"
 authors = ["Simon Holm (@simo899t)"]
 license = "MIT"
-description = "Academic templates (notes, exercises, exams, projects) plus theorem-style blocks."
+description = "SDU-branded document frontpages for Typst: thesis, report, exercise, assignment, project, exam."
 repository = "https://github.com/simo899t/sdust"
 homepage = "https://github.com/simo899t/sdust"
-keywords = ["template", "notes", "theorem", "academic", "university"]
-categories = ["report", "thesis", "components"]
+keywords = ["template", "sdu", "thesis", "academic", "university"]
+categories = ["report", "thesis"]
 disciplines = ["education", "computer-science", "mathematics"]
-# TODO: verify the true minimum — cetz 0.3.4 / fletcher 0.5.7 need at least this.
 compiler = "0.13.0"
-exclude = ["test.typ", "tests/**", ".DS_Store", "CHANGELOG.md"]
+exclude = ["test.typ", "tests/**", "assets/**", ".claude/**", ".vscode/**", ".DS_Store", "CHANGELOG.md"]

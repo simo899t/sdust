@@ -1,13 +1,28 @@
 # sdust
 
-Typst package with document templates (notes, exercises, exams, projects,
-CHI papers) and theorem-style blocks (theorem, definition, example, proof,
-corollary) for academic documents. Institution-agnostic — no bundled logo
-or branding; pass your own via the `logo:` parameter.
+SDU-branded document frontpages for Typst — ready-to-use title pages plus
+sane base styling for coursework at the University of Southern Denmark:
+`thesis`, `note`, `exercise`, `assignment`, `project`, `submission`, `exam`,
+and `chi`.
 
-For SDU-specific defaults (logo, university name) and personal math
-notation, see [tempst](https://github.com/simo899t/tempst), which builds
-on top of this package.
+Every cover page uses the SDU layout, SDU red accent, A4, and defaults to
+"University of Southern Denmark".
+
+**The SDU logo is not bundled.** It's a controlled brand asset
+(`grafiskcenter@sdu.dk`), so no logo is drawn unless you pass one:
+
+```typst
+#show: thesis.with(
+  logo: image("sdu-logo.png", width: 12em),   // download from SDUnet
+  ...
+)
+```
+
+Pass `logo: none` (the default) for no logo at all.
+
+Plotting, trees, pseudocode and node graphs live in
+[utilst](https://github.com/simo899t/utilst). Personal math notation lives
+in [tempst](https://github.com/simo899t/tempst), which builds on both.
 
 ## Installation (local development)
 
@@ -71,19 +86,27 @@ Or once published, just:
 | Function | Description |
 |---|---|
 | `pageSetup` | Base styling, no cover page |
+| `thesis` | Bachelor's / Master's thesis title page |
 | `note` | Lecture notes |
 | `exercise` | Exercise sheets |
 | `assignment` | Assignments |
 | `project` | Group/solo project reports |
+| `submission` | Lightweight hand-in (title card only, no TOC) |
 | `exam` | Exam submissions |
 | `chi` | ACM CHI paper format |
 
-## Theorem-style blocks
+Also exported: `base-style`, `code-style`, `simple-code`, `bib`,
+`word-count` / `total-words`, the branding constants `sdu-red` and
+`sdu-university`, and the Faculty of Science department names
+`imada`, `bmb`, `biology`, `fkf` (pass one as `department:` on `thesis`).
 
-`theorem`, `definition`, `example`, `proof`, `corollary`, `block` — coloured
-titled cards, e.g. `#theorem[...]`.
+## Theorem-style cards
 
-## Other helpers
+`theorem`, `definition`, `example`, `proof`, `corollary`, `block` (the `QED`
+tombstone too), plus the exercise cards `question` / `answer` — coloured
+titled cards, e.g. `#theorem(title: "Theorem 1")[...]`.
 
-`graph`/`dirgraph` (node/edge diagrams), `tree` (tidy-tree wrapper), `pseudo`
-(pseudocode block), `prooftree` (curryst rule), `mycases`, `bib`.
+## Plotting and other helpers
+
+`plot2d` / `plot3d` / `formula`, `tree`, `pseudo`, `graph`, `tex` live in
+[utilst](https://github.com/simo899t/utilst).

@@ -1,3 +1,11 @@
 .DS_Store
 *.pdf
 /tests/**/diff/
+
+# Editor / tooling — local only, never tracked
+/.claude/
+/.vscode/
+
+# SDU logo is a controlled brand asset (grafiskcenter@sdu.dk) — kept
+# locally for development, never committed or published.
+/assets/

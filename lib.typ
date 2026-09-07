@@ -1,3 +1,8 @@
+// This package includes 8 document templates for Typst. These templates include "Thesis, Note, Exercise, Assignment, Exam, Project, Submission and Chi" templates.
+// Each template takes inputs like "title", "author" and "supervisor" and automatically creates page-setup, frontpage, and outline
+// The sdust package also provides several types of blocks, including theorem, definition, and proof blocks, as well as question and answer blocks.
+// Cover pages render no logo by default. The SDU logo is a controlled brand asset and is not bundled — pass your own with `logo: image("sdu-logo.png", width: 12em)`.
+
 // ══════════════════════════════════════════════════════
 // IMPORTS
 // ══════════════════════════════════════════════════════
@@ -5,85 +10,64 @@
 #import "@preview/wordometer:0.1.5": word-count as _word-count, total-words as totalwords
 #let word-count = _word-count
 #let total-words = totalwords
-#import "@preview/plotsy-3d:0.2.1": plot-3d-surface
-#import "@preview/cetz-plot:0.1.1": plot as cetz-plot
-#import "@preview/lovelace:0.3.0": *
-#import "@preview/tdtr:0.5.2" : *
-#import "@preview/h-graph:0.1.0": *
-#import "@preview/cetz:0.3.4": canvas, draw
-#import "@preview/curryst:0.6.0": rule, prooftree
 #import "@preview/codly:1.3.0": codly, codly-init, no-codly
 #import "@preview/codly-languages:0.1.10": codly-languages
-#import "@preview/fletcher:0.5.7" as fletcher: diagram, node, edge
 #import "@preview/itemize:0.2.0" as itmz
-#import "@preview/mitex:0.2.7": mitex
 
-// simple node/edge graph, e.g.
-// #graph(
-//   nodes: ((pos: (0,0), label: $1$), (pos: (1,1), label: $2$)),
-//   edges: (((0,0), (1,1)),),
-// )
-#let graph(nodes: (), edges: (), spacing: 3em, radius: 1.2em, arrow: "-", caption: none) = figure(
-  diagram(
-    node-stroke: 1pt,
-    edge-stroke: 1pt,
-    spacing: spacing,
-    ..nodes.map(n => node(n.pos, n.label, radius: radius)),
-    ..edges.map(e => edge(e.at(0), e.at(1), e.at(2, default: arrow))),
-  ),
-  caption: caption,
-)
+// ══════════════════════════════════════════════════════
+// SDU BRANDING
+// ══════════════════════════════════════════════════════
 
-// renders raw LaTeX math directly, e.g.
-// #tex[\int_a^b f(x)\,dx = F(b) - F(a)]
-#let tex(body) = mitex(body)
+// SDU visual identity — primary "SDU red".
+#let sdu-red = rgb("#C40418")
+#let sdu-university = "University of Southern Denmark"
+
+// Departments of SDU's Faculty of Science — pass one as `department:`.
+#let imada   = "Department of Mathematics and Computer Science"
+#let bmb     = "Department of Biochemistry and Molecular Biology"
+#let biology = "Department of Biology"
+#let fkf     = "Department of Physics, Chemistry and Pharmacy"
+
+// The SDU logo is a controlled brand asset and is NOT bundled with this
+// package. SDU students: download it from SDUnet and pass it yourself, e.g.
+//   #show: thesis.with(logo: image("sdu-logo.png", width: 12em), ...)
+// Templates render no logo unless you pass one (`logo: none` by default).
 
 // ══════════════════════════════════════════════════════
 // BASE STYLE
 // ══════════════════════════════════════════════════════
 
-// Fancy (default) code block styling — language-colored tab with icon,
-// zebra striping, rounded block. This is what raw blocks look like unless
-// a region is wrapped in #simple-code[...].
+// codely code is swapped as default code in sdust use #simple-code[```py ... ```] for regular
 #let code-style(body) = {
   show: codly-init
   codly(
     languages: codly-languages,
     zebra-fill: luma(246),
-    // display-name/display-icon disabled: codly's line-1 badge sits in a
-    // two-column grid whose code-text column is supposed to stretch to fill
-    // available width but instead shrinks to the width of the longest
-    // unbreakable chunk of text on that line — confirmed via direct
-    // measurement (huge unused whitespace next to a wrapped first line).
-    // Reproduces specifically in this document's exact combination of
-    // note()'s leading pagebreak + word-count + codly, independent of any
-    // codly parameter (inset, radius, stroke) we tried. No reliable config
-    // fix found; disabling the badge is the only variant that never wraps.
     display-name: true,
     display-icon: true,
     radius: 5pt,
     stroke: 0.8pt + luma(220),
   )
-  show raw.where(block: true): set text(font: ("Menlo", "DejaVu Sans Mono"), size: 9.5pt)
+  show raw.where(block: true): set text(font: "DejaVu Sans Mono", size: 9.5pt)
   show raw.where(block: false): it => box(
     fill: rgb("#eeeeee"),
     inset: (x: 3pt, y: 0pt),
     outset: (y: 3pt),
     radius: 2pt,
-    text(fill: rgb("#1c1e26"), font: ("Menlo", "DejaVu Sans Mono"), size: 9pt, it),
+    text(fill: rgb("#1c1e26"), font: ("DejaVu Sans Mono", "DejaVu Sans Mono"), size: 9pt, it),
   )
   body
 }
 
 // Opt a region out of codly back to a plain, unstyled code block.
-// Usage: #simple-code[ ```py ... ``` ]
+// Usage: #simple-code[```py ... ```]
 #let simple-code(body) = no-codly(body)
 
 #let base-style(body) = {
   show: _word-count
   // Centered "current/total" page number in the footer of every page.
   set page(numbering: "1/1", number-align: center)
-  set text(font: "Computer Modern", size: 12pt)
+  set text(font: "New Computer Modern", size: 12pt)
   set heading(numbering: "1.1")
   set enum(numbering: "1.", full: true)
   show: itmz.default-enum-list.with(indent: auto, item-spacing: auto)
@@ -100,70 +84,10 @@
   body
 }
 
-#let bib = bibliography.with(style: "chicago-author-date")
-
 #let pageSetup(body) = {
-  set page(paper: "us-letter", margin: (left: 3cm, right: 3cm, top: 2cm, bottom: 2cm))
+  set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 2cm, bottom: 2cm))
   base-style(body)
 }
-
-// proof tree (curryst), e.g.
-// #prooftree(rule(
-//   label: [Label],
-//   name: [Rule name],
-//   [Premise 1],
-//   [Premise 2],
-//   [Conclusion],
-// ))
-
-// pseudocode block, e.g.
-// #pseudo(pseudocode(
-//   [*if* $x > 0$],
-//   ind, [return $x$], ded,
-//   [*else*],
-//   ind, [return $-x$],
-// ))
-
-#let pseudo(body) = {
-  show math.equation.where(block: true): eq => block(width: 100%, align(center, eq))
-  pseudocode-list(body)
-}
-
-// ══════════════════════════════════════════════════════
-// TREES  (tidy)
-// ══════════════════════════════════════════════════════
-// `edges`: "straight" (default) draws direct diagonal arrows between nodes.
-//          "square" / "orthogonal" / "elbow" draws right-angled connector
-//          lines (horizontal-then-vertical) like a classic file/AST tree.
-// `draw-edge`: pass a custom tdtr draw-edge function to override `edges`.
-#let tree(body, reverse: false, shape: "circle", edges: "straight", draw-node: none, draw-edge: none, ..args) = {
-  let shape-draw-node = if shape == "circle" or shape == "circ" {
-    tidy-tree-draws.circle-draw-node
-  } else if shape == "rect" or shape == "rectangle" {
-    ((name, label, pos)) => (pos: (pos.x, pos.y), label: [#label], name: name, shape: rect)
-  } else if shape == "square" {
-    ((name, label, pos)) => (pos: (pos.x, pos.y), label: [#label], name: name, shape: rect, width: 1.6em, height: 1.6em)
-  } else if shape == none {
-    tidy-tree-draws.hidden-draw-node
-  } else {
-    tidy-tree-draws.circle-draw-node
-  }
-  let effective-draw-node = if draw-node != none { draw-node } else { shape-draw-node }
-  let draw-nodes = if reverse {
-    (effective-draw-node, ((name, label, pos)) => (pos: (pos.x, -pos.y)))
-  } else {
-    effective-draw-node
-  }
-  let effective-draw-edge = if draw-edge != none {
-    draw-edge
-  } else if edges == "square" or edges == "orthogonal" or edges == "elbow" {
-    tidy-tree-draws.horizontal-vertical-draw-edge
-  } else {
-    tidy-tree-draws.default-draw-edge
-  }
-  tidy-tree-graph(body, draw-node: draw-nodes, draw-edge: effective-draw-edge, ..args)
-}
-
 
 // ══════════════════════════════════════════════════════
 // UTILITIES
@@ -174,249 +98,13 @@
   else { author }
 }
 
-#let group-by-pairs(elements) = {
-  let lefts = elements
-    .enumerate()
-    .filter(((index, _)) => calc.rem(index, 2) == 0)
-    .map(((_, element)) => element)
-  let rights = elements
-    .enumerate()
-    .filter(((index, _)) => calc.rem(index, 2) == 1)
-    .map(((_, element)) => element)
-  lefts.zip(rights)
-}
+// custom citations
+#let bib = bibliography.with(style: "chicago-author-date")
 
-// ══════════════════════════════════════════════════════
-// PLOTTING
-// ══════════════════════════════════════════════════════
+// end-of-proof tombstone symbol
+#let QED = h(1fr) + box(width: 0.6em, height: 0.6em, stroke: 0.8pt + black)
 
-// ── formula parser ──────────────────────────────────────
-// Lets plot2d/plot3d accept a plain math string ("x^2 + sin(y)") instead
-// of a Typst closure. Typst's eval(mode: "math") only typesets a formula,
-// it doesn't compute a number from it, so there's no built-in/package way
-// to do this — this is a small hand-rolled precedence-climbing parser.
-
-#let _formula-tokenize(s) = {
-  let re = regex("[0-9]+\.?[0-9]*|[a-zA-Z_][a-zA-Z0-9_]*|\S")
-  s.matches(re).map(m => m.text)
-}
-
-#let _formula-const(name) = {
-  if name == "pi" { calc.pi } else if name == "e" { calc.e } else { none }
-}
-
-#let _formula-call(fname, a) = {
-  if fname == "sin" { calc.sin(a.at(0)) }
-  else if fname == "cos" { calc.cos(a.at(0)) }
-  else if fname == "tan" { calc.tan(a.at(0)) }
-  else if fname == "sqrt" { calc.sqrt(a.at(0)) }
-  else if fname == "exp" { calc.exp(a.at(0)) }
-  else if fname == "ln" { calc.ln(a.at(0)) }
-  else if fname == "log" { calc.log(a.at(0)) }
-  else if fname == "abs" { calc.abs(a.at(0)) }
-  else if fname == "max" { calc.max(..a) }
-  else if fname == "min" { calc.min(..a) }
-  else { panic("plot formula: unknown function \"" + fname + "\"") }
-}
-
-#let _formula-eval(node, vars) = {
-  let op = node.op
-  if op == "num" { node.val }
-  else if op == "var" {
-    if node.name in vars { vars.at(node.name) } else {
-      let c = _formula-const(node.name)
-      if c != none { c } else { panic("plot formula: unknown variable \"" + node.name + "\"") }
-    }
-  }
-  else if op == "neg" { -_formula-eval(node.a, vars) }
-  else if op == "add" { _formula-eval(node.a, vars) + _formula-eval(node.b, vars) }
-  else if op == "sub" { _formula-eval(node.a, vars) - _formula-eval(node.b, vars) }
-  else if op == "mul" { _formula-eval(node.a, vars) * _formula-eval(node.b, vars) }
-  else if op == "div" { _formula-eval(node.a, vars) / _formula-eval(node.b, vars) }
-  else if op == "pow" { calc.pow(_formula-eval(node.a, vars), _formula-eval(node.b, vars)) }
-  else if op == "call" { _formula-call(node.name, node.args.map(n => _formula-eval(n, vars))) }
-}
-
-#let _formula-prec(op) = (
-  if op == "+" or op == "-" { 1 }
-  else if op == "*" or op == "/" { 2 }
-  else if op == "^" { 3 }
-  else { -1 }
-)
-
-// Precedence-climbing parser — kept as a single self-recursive function
-// since Typst #let functions can't forward-reference each other for
-// mutual recursion.
-#let _formula-parse(toks, pos, min-prec) = {
-  let (lhs, p) = {
-    let t = toks.at(pos)
-    if t == "-" {
-      let (a, p2) = _formula-parse(toks, pos + 1, 3)
-      ((op: "neg", a: a), p2)
-    } else if t == "(" {
-      let (a, p2) = _formula-parse(toks, pos + 1, 0)
-      (a, p2 + 1)
-    } else if t.at(0) in "0123456789" {
-      ((op: "num", val: float(t)), pos + 1)
-    } else if pos + 1 < toks.len() and toks.at(pos + 1) == "(" {
-      let args = ()
-      let p2 = pos + 2
-      if toks.at(p2) != ")" {
-        while true {
-          let (arg, p3) = _formula-parse(toks, p2, 0)
-          args.push(arg)
-          p2 = p3
-          if toks.at(p2) == "," { p2 = p2 + 1 } else { break }
-        }
-      }
-      ((op: "call", name: t, args: args), p2 + 1)
-    } else {
-      ((op: "var", name: t), pos + 1)
-    }
-  }
-
-  let lhs = lhs
-  let p = p
-  while p < toks.len() and _formula-prec(toks.at(p)) >= min-prec and _formula-prec(toks.at(p)) > 0 {
-    let op = toks.at(p)
-    let prec = _formula-prec(op)
-    let next-min = if op == "^" { prec } else { prec + 1 }
-    let (rhs, p2) = _formula-parse(toks, p + 1, next-min)
-    let node-op = if op == "+" { "add" } else if op == "-" { "sub" } else if op == "*" { "mul" } else if op == "/" { "div" } else { "pow" }
-    lhs = (op: node-op, a: lhs, b: rhs)
-    p = p2
-  }
-  (lhs, p)
-}
-
-// Parse a math string into a callable, e.g. formula("x^2 + sin(y)", vars: ("x","y")).
-#let formula(expr, vars: ("x", "y")) = {
-  let toks = _formula-tokenize(expr)
-  let (ast, _) = _formula-parse(toks, 0, 0)
-  (..args) => {
-    let named = (:)
-    for (i, name) in vars.enumerate() {
-      named.insert(name, args.pos().at(i))
-    }
-    _formula-eval(ast, named)
-  }
-}
-
-// Accept a function, a formula string, or an array of either.
-#let _as-fn(f, vars) = if type(f) == str { formula(f, vars: vars) } else { f }
-
-// 2D plot of y = f(x). f: is a closure or a formula string ("sin(x)"), or
-// an array of either (each plotted as its own line). x: (min, max) domain.
-// #plot2d(f: "sin(x)", x: (0, 2 * calc.pi))
-// #plot2d(f: x => calc.sin(x), x: (0, 2 * calc.pi))
-#let plot2d(
-  f: none,
-  x: (-5, 5),
-  size: (8, 6),
-  samples: 100,
-  axis-style: "school-book",
-  legend: none,
-  ..style,
-) = {
-  let fns = if type(f) == array { f } else { (f,) }
-  fns = fns.map(fn => _as-fn(fn, ("x",)))
-  canvas(length: 1cm, {
-    cetz-plot.plot(
-      size: size,
-      axis-style: axis-style,
-      legend: legend,
-      {
-        for fn in fns {
-          cetz-plot.add(fn, domain: x, samples: samples, ..style)
-        }
-      },
-    )
-  })
-}
-
-// 3D surface plot of z = f(x, y). f: is a closure or a formula string
-// ("x^2 + y^2"). By default samples the function over the x/y domain to
-// auto-scale the axes so the plot renders at a sane size — pass
-// z: (min, max) to skip sampling and use an explicit z range, or override
-// scale-dim/axis-step yourself for finer control.
-// #plot3d(f: "x^2 + y^2", x: (-3, 3), y: (-3, 3))
-// #plot3d(f: (x, y) => x*x + y*y, x: (-3, 3), y: (-3, 3))
-#let plot3d(
-  f: none,
-  x: (-5, 5),
-  y: (-5, 5),
-  z: auto,
-  grid: 12,
-  k: 0.6,
-  axis-label-offset: (0.06, 0.04, 0.03),
-  ..args,
-) = {
-  let f = _as-fn(f, ("x", "y"))
-  let (x-lo, x-hi) = x
-  let (y-lo, y-hi) = y
-  let (z-lo, z-hi) = if z != auto {
-    z
-  } else {
-    let zs = ()
-    for i in range(grid + 1) {
-      let xv = x-lo + (x-hi - x-lo) * i / grid
-      for j in range(grid + 1) {
-        let yv = y-lo + (y-hi - y-lo) * j / grid
-        zs.push(f(xv, yv))
-      }
-    }
-    (calc.min(..zs), calc.max(..zs))
-  }
-  let x-range = calc.max(x-hi - x-lo, 1e-6)
-  let y-range = calc.max(y-hi - y-lo, 1e-6)
-  let z-range = calc.max(z-hi - z-lo, 1e-6)
-  let default-scale-dim = (k / x-range, k / y-range, k / z-range)
-  let default-axis-step = (
-    calc.max(int(calc.round(x-range / 4)), 1),
-    calc.max(int(calc.round(y-range / 4)), 1),
-    calc.max(int(calc.round(z-range / 4)), 1),
-  )
-  plot-3d-surface(
-    f,
-    xdomain: x,
-    ydomain: y,
-    scale-dim: default-scale-dim,
-    axis-step: default-axis-step,
-    axis-label-offset: axis-label-offset,
-    ..args,
-  )
-}
-
-// ══════════════════════════════════════════════════════
-// EXERCISE CARDS
-// ══════════════════════════════════════════════════════
-#let question(title: none, body) = block(
-  width: 100%,
-  inset: 10pt,
-  radius: 4pt,
-  fill: luma(245),
-  [
-    #if title != none {
-      strong(title)
-      h(0.5em)
-    }
-    #body
-  ],
-)
-
-
-#let answer(body) = block(
-  width: 100%,
-  inset: (left: 10pt, right: 10pt, top: 4pt, bottom: 10pt),
-  stroke: (left: 1pt + luma(180)),
-  body,
-)
-
-// ══════════════════════════════════════════════════════
-// CARD COMPONENTS
-// ══════════════════════════════════════════════════════
-
-// Internal base: coloured header bar + tinted body.
+// Internal base for the titled cards below: coloured header bar + tinted body.
 #let _titled-card(
   title: none,
   width: 100%,
@@ -499,9 +187,6 @@
   content,
 )
 
-// end-of-proof tombstone symbol
-#let QED = h(1fr) + box(width: 0.6em, height: 0.6em, stroke: 0.8pt + black)
-
 // white/neutral proof — same shape as example, plain color, ends with QED,
 // e.g. #proof[By induction on $n$. ...]
 #let proof(title: "Proof", width: 100%, content) = _titled-card(
@@ -511,21 +196,97 @@
   [#content #QED],
 )
 
+// ═══════════════════════════
+// QUESTION AND ANSWERS BLOCKS
+// ═══════════════════════════
 
-// ══════════════════════════════════════════════════════
+// prompt block, e.g. #question(title: "Exercise 1")[Solve for $x$.]
+#let question(title: none, body) = std.block(
+  width: 100%,
+  inset: 10pt,
+  radius: 4pt,
+  fill: luma(245),
+  [
+    #if title != none {
+      strong(title)
+      h(0.5em)
+    }
+    #body
+  ],
+)
+
+// indented answer body under a #question, e.g. #answer[$x = 2$.]
+#let answer(body) = std.block(
+  width: 100%,
+  inset: (left: 10pt, right: 10pt, top: 4pt, bottom: 10pt),
+  stroke: (left: 1pt + luma(180)),
+  body,
+)
+
+
+// ══════════════════
 // DOCUMENT TEMPLATES
-//
-// All cover pages accept an optional `logo:` parameter (image content,
-// e.g. `image("logo.png", width: 15em)`). Left as `none` by default so
-// this package carries no institutional branding, one can pass own logo
-// from the calling document, or wrap these templates with your
-// institution's defaults in your own package.
-// ══════════════════════════════════════════════════════
+// ══════════════════
 
 #let default-title  = "Untitled Document"
-#let default-course = "University"
+#let default-course = sdu-university
 #let default-author = "Firstname Lastname"
 #let default-date   = "16/12/2002"
+
+// ── Thesis ──
+#let thesis(
+  title: default-title,
+  subtitle: none,
+  author: default-author,
+  supervisor: none,
+  department: none,
+  programme: none,
+  university: sdu-university,
+  date: default-date,
+  logo: none,
+  outline: true,
+  outline-depth: none,
+  ..args,
+) = {
+  let body = args.pos().at(0, default: [])
+  set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
+  align(center,
+    stack(
+      spacing: 0pt,
+      if logo != none { stack(v(0.4cm), logo, v(1.6cm)) } else { v(1.2cm) },
+      text(size: 13pt, fill: rgb("#555555"))[#university],
+      if department != none {
+        stack(v(0.4em), text(size: 11pt, fill: rgb("#777777"))[#department])
+      },
+      v(0.6em),
+      line(length: 60%, stroke: 0.5pt + sdu-red),
+      v(2.5cm),
+      text(size: 9.5pt, fill: sdu-red, tracking: 2.5pt, weight: "bold")[
+        #if programme != none { upper(programme) } else [THESIS]
+      ],
+      v(1.2em),
+      text(size: 28pt, weight: "bold")[#title],
+      if subtitle != none {
+        stack(v(1.2em), text(size: 15pt, fill: rgb("#444444"), style: "italic")[#subtitle])
+      },
+      v(1em),
+      line(length: 40%, stroke: 0.5pt + rgb("#aaaaaa")),
+      v(1fr),
+      text(size: 12pt)[#_fmt-authors(author)],
+      if supervisor != none {
+        stack(v(0.5em), text(size: 10pt, fill: rgb("#666666"))[
+          Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]: #_fmt-authors(supervisor)
+        ])
+      },
+      v(0.4em),
+      text(size: 11pt, fill: rgb("#888888"))[#date],
+      v(1cm),
+    )
+  )
+  pagebreak()
+  if outline { std.outline(depth: outline-depth); pagebreak() }
+  base-style(body)
+}
 
 // ── note ─────────────────────────────────────────────
 #let note(
@@ -541,14 +302,14 @@
   ..args,
 ) = {
   let body = args.pos().at(0, default: [])
-  set page(paper: "us-letter", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
+  set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
   align(center,
     stack(
       spacing: 0pt,
       v(1.2cm),
-      line(length: 100%, stroke: 3pt + rgb("#2c5aa0")),
+      line(length: 100%, stroke: 3pt + sdu-red),
       v(1.2em),
-      text(size: 9.5pt, fill: rgb("#2c5aa0"), tracking: 2.5pt, weight: "bold")[LECTURE NOTES],
+      text(size: 9.5pt, fill: sdu-red, tracking: 2.5pt, weight: "bold")[LECTURE NOTES],
       v(2.5cm),
       text(size: 30pt, weight: "bold")[#title],
       if subtitle != none {
@@ -589,14 +350,14 @@
   ..args,
 ) = {
   let body = args.pos().at(0, default: [])
-  set page(paper: "us-letter", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
+  set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
   align(center,
     stack(
       spacing: 0pt,
       v(1.2cm),
-      line(length: 100%, stroke: 3pt + rgb("#b7410e")),
+      line(length: 100%, stroke: 3pt + sdu-red),
       v(1.2em),
-      text(size: 9.5pt, fill: rgb("#b7410e"), tracking: 2.5pt, weight: "bold")[EXERCISES],
+      text(size: 9.5pt, fill: sdu-red, tracking: 2.5pt, weight: "bold")[EXERCISES],
       v(2.5cm),
       text(size: 30pt, weight: "bold")[#title],
       v(1.3em),
@@ -634,14 +395,14 @@
   ..args,
 ) = {
   let body = args.pos().at(0, default: [])
-  set page(paper: "us-letter", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
+  set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
   align(center,
     stack(
       spacing: 0pt,
       v(1.2cm),
-      line(length: 100%, stroke: 3pt + rgb("#b7410e")),
+      line(length: 100%, stroke: 3pt + sdu-red),
       v(1.2em),
-      text(size: 9.5pt, fill: rgb("#621e00"), tracking: 2.5pt, weight: "bold")[ASSIGNMENTS],
+      text(size: 9.5pt, fill: sdu-red, tracking: 2.5pt, weight: "bold")[ASSIGNMENTS],
       v(2.5cm),
       text(size: 30pt, weight: "bold")[#title],
       v(1.3em),
@@ -675,7 +436,7 @@
   date: default-date,
   group: none,
   supervisor: none,
-  university: "University",
+  university: sdu-university,
   logo: none,
   abstract: none,
   keywords: none,
@@ -684,7 +445,7 @@
   ..args,
 ) = {
   let body = args.pos().at(0, default: [])
-  set page(paper: "us-letter", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
+  set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
   align(center,
     stack(
       spacing: 0pt,
@@ -801,13 +562,13 @@
   subtitle: none,
   author: none,
   supervisor: none,
-  institution: "University",
+  institution: sdu-university,
   date: default-date,
   logo: none,
   ..args,
 ) = {
   let body = args.pos().at(0, default: [])
-  set page(paper: "us-letter", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
+  set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
   align(center,
     stack(
       spacing: 0pt,
@@ -858,7 +619,7 @@
   duration: none,
   allowed-aids: none,
   supervisor: none,
-  university: "University",
+  university: sdu-university,
   logo: none,
   outline: true,
   outline-depth: none,
@@ -871,7 +632,7 @@
       else { author.at(0).at("name", default: "") }
     } else { "" }
   set page(
-    paper: "us-letter",
+    paper: "a4",
     margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm),
     header: if username != none or student-number != none {
       set text(size: 9pt, fill: rgb("#555555"))
@@ -891,7 +652,7 @@
       v(0.6em),
       line(length: 60%, stroke: 0.5pt + rgb("#aaaaaa")),
       v(0.5cm),
-      text(size: 9.5pt, fill: rgb("#1a6b3c"), tracking: 2.5pt, weight: "bold")[EXAM],
+      text(size: 9.5pt, fill: sdu-red, tracking: 2.5pt, weight: "bold")[EXAM],
       v(4.5cm),
       text(size: 28pt, weight: "bold")[#title],
       if subtitle != none {
@@ -1055,18 +816,35 @@
 }
 
 /*
-=============================================================
+===================================================
 TEMPLATES — copy the block you need into a new file
-=============================================================
+===================================================
 
-── NOTE ──────────────────────────────────────────────────────
+── THESIS ──
+#import "@preview/sdust:0.1.0": *
+#show: thesis.with(
+  title:         "Thesis Title",
+  subtitle:      "Optional subtitle",          // optional
+  author:        "Firstname Lastname",
+  supervisor:    "Prof. Firstname Lastname",   // optional, string or array
+  department:    imada,                        // optional — imada/bmb/biology/fkf or any string
+  programme:     "MSc in Computer Science",    // optional
+  date:          "date",
+  outline:       true,
+  outline-depth: 2,
+)
+
+= Introduction
+//Content goes here.
+
+── NOTE ──
 #import "@preview/sdust:0.1.0": *
 #show: note.with(
   title:         "Lecture Notes",
   course:        "DM000 — Course Name",
   author:        "Firstname Lastname",
   date:          "date",
-  logo:          image("logo.png", width: 15em),   // optional
+  logo:          none,          // auto = SDU logo (default); or image(...)
   outline:       true,          // set false to skip TOC
   outline-depth: 2,             // none = unlimited depth
 )
@@ -1074,7 +852,7 @@ TEMPLATES — copy the block you need into a new file
 = First Section
 Content goes here.
 
-── EXERCISE ──────────────────────────────────────────────────
+── EXERCISE ──
 #import "@preview/sdust:0.1.0": *
 #show: exercise.with(
   title:         "Exercises 1",
@@ -1088,7 +866,7 @@ Content goes here.
 = Exercise 1
 Content goes here.
 
-── ASSIGNMENT ────────────────────────────────────────────────
+── ASSIGNMENT ──
 #import "@preview/sdust:0.1.0": *
 #show: assignment.with(
   title:         "Assignment 1",
@@ -1102,7 +880,7 @@ Content goes here.
 = Problem 1
 Content goes here.
 
-── EXAM ──────────────────────────────────────────────────────
+── EXAM ──
 #import "@preview/sdust:0.1.0": *
 #show: exam.with(
   title:         "Written Exam",
@@ -1115,14 +893,13 @@ Content goes here.
   student-number: "215751682",                 // optional — shown in page header
   duration:      "4 hours",                    // optional
   allowed-aids:  "All written materials",      // optional
-  university:    "University",
   outline:       false,
 )
 
 = Problem 1
 Content goes here.
 
-── PROJECT ───────────────────────────────────────────────────
+── PROJECT ──
 #import "@preview/sdust:0.1.0": *
 #show: project.with(
   title:         "Project Title",
@@ -1132,7 +909,6 @@ Content goes here.
   date:          "date",
   group:         "Group 4",                    // optional
   supervisor:    "Prof. Firstname Lastname",   // optional
-  university:    "University",
   outline:       true,
   outline-depth: 2,
 )
@@ -1140,21 +916,20 @@ Content goes here.
 = Introduction
 Content goes here.
 
-── SUBMISSION ────────────────────────────────────────────────
+── SUBMISSION ──
 #import "@preview/sdust:0.1.0": *
 #show: submission.with(
   title:         "Submission Title",
   subtitle:      "Optional subtitle",          // optional
   author:        "Firstname Lastname",         // or array of dicts, see #project
   supervisor:    "Prof. Firstname Lastname",   // optional, string or array
-  institution:   "University",
   date:          "date",
 )
 
 = Introduction
 Content goes here.
 
-── CHI PAPER ─────────────────────────────────────────────────
+── CHI PAPER ──
 #import "@preview/sdust:0.1.0": *
 #show: chi.with(
   title: "Paper Title",
@@ -1165,7 +940,6 @@ Content goes here.
   keywords: ("keyword one", "keyword two"),
   date:     "date",
 )
-#set page(columns: 2)
 
 = Introduction
 Content goes here.

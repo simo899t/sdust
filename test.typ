@@ -8,10 +8,11 @@
   outline-depth: 2,
 )
 
-#question(title: "")[
-  Test
-] 
+= First Section
 
-#answer[
-  Test
-]
+Some text with inline `code` and a block:
+
+```py
+print("hello")
+
+```
