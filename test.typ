@@ -1,18 +1,15 @@
 #import "@local/sdust:0.1.0": *
-#show: note.with(
-  title:         "Lecture Notes",
-  course:        "DM000 — Course Name",
-  author:        "Simon Holm",
-  date:          "date",
+
+#import "@local/tempst:0.1.0": *
+#show: thesis.with(
+  title:         "Project Titles",
+  //subtitle:      "Project Subtitle",
+  programme:     "Bcs in Artificial Intelligence",
+  author:        ("Firstname Lastname"),
+  date:          "Spring 2027",
+  supervisor:    "Prof. Firstname Lastname",
+  university:    sdu-university,
+  department:    imada,
   outline:       true,
   outline-depth: 2,
 )
-
-= First Section
-
-Some text with inline `code` and a block:
-
-```py
-print("hello")
-
-```
