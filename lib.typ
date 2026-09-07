@@ -844,7 +844,7 @@ TEMPLATES — copy the block you need into a new file
   course:        "DM000 — Course Name",
   author:        "Firstname Lastname",
   date:          "date",
-  logo:          none,          // auto = SDU logo (default); or image(...)
+  logo:          none,          // or image("sdu-logo.png", width: 12em)
   outline:       true,          // set false to skip TOC
   outline-depth: 2,             // none = unlimited depth
 )
