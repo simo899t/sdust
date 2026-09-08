@@ -168,7 +168,7 @@
   title: title, width: width,
   header-fill: rgb("#4b5563"), body-fill: white,
   border: rgb("#d1d5db"), body-text-fill: rgb("#1f2937"),
-  [#content #QED],
+  [#content],
 )
 
 // ═══════════════════════════
