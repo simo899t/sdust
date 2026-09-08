@@ -34,11 +34,11 @@ Want the styling without a cover page? Use `page-setup`:
 = First Section
 ```
 
-## The SDU logo
+## The logo
 
-The SDU logo is a controlled brand asset (`grafiskcenter@sdu.dk`) and is
-**not bundled**. No logo is drawn unless you pass one; download it from
-SDUnet and hand it in:
+The SDU logo is a controlled brand asset and is therefore
+**not bundled**. No logo is drawn unless you pass one, one can download it from
+SDUs own website:
 
 ```typst
 #show: thesis.with(
