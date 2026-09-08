@@ -88,8 +88,8 @@ Coloured titled cards for notes and exercises — `theorem`, `definition`,
 ]
 
 #proof[
-  Expand the Rayleigh quotient over the space orthogonal to $bold(1)$.
-]  // ends with a QED tombstone
+  Expand the Rayleigh quotient over the space orthogonal to $bold(1)$. #QED
+]
 
 #question(title: "Exercise 4")[
   Show that a tree on $n$ vertices has exactly $n - 1$ edges.
@@ -103,7 +103,8 @@ Coloured titled cards for notes and exercises — `theorem`, `definition`,
 ![theorem, definition, example, proof and question/answer blocks](https://raw.githubusercontent.com/simo899t/sdust/master/cards.png)
 
 The title argument is optional (`#theorem[...]` defaults to "Theorem"),
-and `block` gives the plain `QED`-terminated card.
+and `block` gives a plain grey card. `QED` is exported as a standalone
+end-of-proof tombstone — add it yourself where you want it.
 
 ## Also exported
 
