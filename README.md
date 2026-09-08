@@ -1,9 +1,7 @@
 # sdust
 
 Ready-to-use, SDU-branded document frontpages for coursework at the
-University of Southern Denmark (Syddansk Universitet) — a title page and
-sane base styling for every kind of hand-in, so you can start writing
-instead of rebuilding the institutional layout.
+University of Southern Denmark (Syddansk Universitet), a title page and page setup for every kind of hand-in.
 
 ![Lecture notes, exercise, and assignment cover pages produced by sdust](https://raw.githubusercontent.com/simo899t/sdust/master/preview.png)
 
