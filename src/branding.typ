@@ -19,6 +19,6 @@
 
 // Defaults used by every template when an argument is omitted.
 #let default-title  = "Untitled Document"
-#let default-course = sdu-university
+#let default-course = "DM000"
 #let default-author = "Firstname Lastname"
 #let default-date   = datetime.today().display("[day]/[month]/[year]")
