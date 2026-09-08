@@ -68,7 +68,7 @@ Common named arguments: `title`, `subtitle`, `author` (string or array),
 `group:`, `abstract:` and `keywords:`; `exam` takes `duration:`,
 `student-number:` and more.
 
-## Theorem-style cards
+## Page cards
 
 Coloured titled cards for notes and exercises — `theorem`, `definition`,
 `example`, `proof` and `corollary`, plus exercise pair
@@ -114,7 +114,7 @@ the Faculty of Science department names `imada`, `bmb`, `biology`, `fkf`
 
 ## ACM / CHI papers
 
-sdust does not reproduce the ACM class. For an ACM paper — including CHI
+sdust does not reproduce the ACM class. For an ACM paper,including CHI
 (`format: "manuscript"` for review, `format: "sigconf"` for camera-ready) —
 use [`faithful-acmart`](https://typst.app/universe/package/faithful-acmart).
 
