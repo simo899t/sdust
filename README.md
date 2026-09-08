@@ -73,7 +73,7 @@ Common named arguments: `title`, `subtitle`, `author` (string or array),
 ## Theorem-style cards
 
 Coloured titled cards for notes and exercises — `theorem`, `definition`,
-`example`, `proof` and `corollary`, plus the exercise pair
+`example`, `proof` and `corollary`, plus exercise pair
 `question` / `answer`:
 
 ```typst
