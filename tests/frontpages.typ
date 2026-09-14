@@ -13,19 +13,19 @@
 ]
 
 #pagebreak()
-#note(title: "Notes", course: "DM000", author: "Simon Holm", date: "2026", logo: none)[= S1
+#note(title: "Lecture 1: Introduction", course: "DM000", author: "Simon Holm", date: "2026", logo: none)[= S1
 Body.]
 
 #pagebreak()
-#exercise(title: "Ex 1", course: "DM000", author: "Simon Holm", date: "2026")[= E1
+#exercise(title: "Exercise 1: Just an exercise", course: "DM000", author: "Simon Holm", date: "2026")[= E1
 Body.]
 
 #pagebreak()
-#assignment(title: "A1", course: "DM000", author: "Simon Holm", date: "2026")[= P1
+#assignment(title: "Assignment title", course: "DM000", author: "Simon Holm", date: "2026")[= P1
 Body.]
 
 #pagebreak()
-#project(title: "Proj", course: "DM000", author: "Simon Holm", date: "2026", group: "Group 4", supervisor: "Prof. A")[= Intro
+#project(title: "A project about something", course: "DM000", author: "Simon Holm", date: "2026", group: "Group 4", supervisor: "Prof. A")[= Intro
 Body.]
 
 #pagebreak()
