@@ -4,7 +4,7 @@
 #theorem(title: "Theorem 2.1 (Pythagorean theorem)")[
   For a right-angled triangle with legs $a$ and $b$ and hypotenuse $c$,
 
-  #boxed($ a^2 + b^2 = c^2 $)
+  #boxed(inset: (x: 10pt, y: 10pt), stroke: 0.6pt, stroke-color: rgb(3,3,3))[$ a^2 + b^2 = c^2 $]
 ]
 
 #definition(title: "Definition 2.2 (Injective function)")[

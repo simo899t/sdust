@@ -25,7 +25,7 @@ Body.]
 Body.]
 
 #pagebreak()
-#project(title: "A project about something", course: "DM000", author: "Simon Holm", date: "2026", group: "Group 4", supervisor: "Prof. A")[= Intro
+#project(title: "A project about something", course: "DM000", author: "Simon Holm", date: "2026", group: "Group 4", supervisor: ("Prof. A", "Test"), info-width: 90%)[= Intro
 Body.]
 
 #pagebreak()
@@ -34,4 +34,8 @@ Body.]
 
 #pagebreak()
 #submission(title: "Sub", author: "Simon Holm", supervisor: "Prof. A", date: "2026")[= Intro
+Body.]
+
+#pagebreak()
+#research(title: "Title", author: "Simon Holm", supervisor: "Prof. A", date: "2026")[= Intro
 Body.]

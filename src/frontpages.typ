@@ -11,7 +11,7 @@
 #import "base.typ": base-style
 
 #let _fmt-authors(author) = {
-  if type(author) == array { author.join(" · ") }
+  if type(author) == array { author.join(", ", last: " & ") }
   else { author }
 }
 
@@ -29,7 +29,7 @@
   department: none,
   programme: none,
   university: sdu-university,
-  date: default-date,
+  date: none,
   logo: none,
   outline: true,
   outline-depth: none,
@@ -78,10 +78,10 @@
       },
       v(1cm),
       if department != none {
-        stack(v(0.4em), text(size: 14pt, fill: rgb("#777777"))[#smallcaps[#department]])
+        stack(v(0.4em), text(size: 14pt, fill: rgb("#777777"))[#smallcaps[#_fmt-lines(department)]])
       },
       v(6em),
-      text(size: 12pt, fill: rgb("#888888"))[#date],
+      if date != none { text(size: 12pt, fill: rgb("#888888"))[#date] },
     )
   )
   pagebreak()
@@ -96,7 +96,7 @@
   author: default-author,
   supervisor: none,
   course: default-course,
-  date: default-date,
+  date: none,
   logo: none,
   outline: true,
   outline-depth: none,
@@ -128,7 +128,7 @@
         ])
       },
       v(0.3em),
-      text(size: 11pt, fill: rgb("#888888"))[#date],
+      if date != none { text(size: 11pt, fill: rgb("#888888"))[#date] },
       if logo != none { stack(v(1.8em), logo) },
       v(1cm),
     )
@@ -141,10 +141,11 @@
 // ── exercise ─────────────────────────────────────────
 #let exercise(
   title: default-title,
+  subtitle: none,
   author: default-author,
   supervisor: none,
   course: default-course,
-  date: default-date,
+  date: none,
   logo: none,
   outline: true,
   outline-depth: none,
@@ -161,6 +162,9 @@
       text(size: 9.5pt, fill: sdu-red, tracking: 2.5pt, weight: "bold")[EXERCISE],
       v(2.5cm),
       text(size: 30pt, weight: "bold")[#title],
+      if subtitle != none {
+        stack(v(1em), text(size: 14pt, fill: rgb("#444444"), style: "italic")[#subtitle])
+      },
       v(1.3em),
       line(length: 28%, stroke: 0.5pt + rgb("#bbbbbb")),
       v(0.7em),
@@ -173,7 +177,7 @@
         ])
       },
       v(0.3em),
-      text(size: 11pt, fill: rgb("#888888"))[#date],
+      if date != none { text(size: 11pt, fill: rgb("#888888"))[#date] },
       if logo != none { stack(v(1.8em), logo) },
       v(1cm),
     )
@@ -186,10 +190,11 @@
 // ── assignment ───────────────────────────────────────
 #let assignment(
   title: default-title,
+  subtitle: none,
   author: default-author,
   supervisor: none,
   course: default-course,
-  date: default-date,
+  date: none,
   logo: none,
   outline: true,
   outline-depth: none,
@@ -206,6 +211,9 @@
       text(size: 9.5pt, fill: sdu-red, tracking: 2.5pt, weight: "bold")[ASSIGNMENT],
       v(2.5cm),
       text(size: 30pt, weight: "bold")[#title],
+      if subtitle != none {
+        stack(v(1em), text(size: 14pt, fill: rgb("#444444"), style: "italic")[#subtitle])
+      },
       v(1.3em),
       line(length: 28%, stroke: 0.5pt + rgb("#bbbbbb")),
       v(0.7em),
@@ -218,7 +226,7 @@
         ])
       },
       v(1.8em),
-      text(size: 11pt, fill: rgb("#888888"))[#date],
+      if date != none { text(size: 11pt, fill: rgb("#888888"))[#date] },
       if logo != none { stack(v(1.8em), logo) },
       v(1cm),
     )
@@ -234,7 +242,7 @@
   subtitle: none,
   author: default-author,
   course: default-course,
-  date: default-date,
+  date: none,
   group: none,
   supervisor: none,
   university: sdu-university,
@@ -316,8 +324,10 @@
               text(fill: rgb("#777777"))[*Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]:*],
               text()[#_fmt-authors(supervisor)])
           },
-          grid(columns: (4cm, 1fr),
-            text(fill: rgb("#777777"))[*Date:*], text()[#date]),
+          if date != none {
+            grid(columns: (4cm, 1fr),
+              text(fill: rgb("#777777"))[*Date:*], text()[#date])
+          },
         ))
       ),
       if abstract != none {
@@ -360,6 +370,45 @@
   base-style(body)
 }
 
+// ── basic ────────────────────────────────────────────
+// Minimal: title, subtitle, authors and date above the body on the
+// first page. No cover page, info box or logo.
+#let basic(
+  title: default-title,
+  subtitle: none,
+  author: default-author,
+  date: none,
+  outline: false,
+  outline-depth: none,
+  ..args,
+) = {
+  let body = args.pos().at(0, default: [])
+  show: base-style
+  set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
+  align(center, {
+    set par(justify: false, leading: 0.6em)
+    set text(hyphenate: false)
+    text(size: 22pt, weight: "bold")[#title]
+    if subtitle != none {
+      v(0.6em)
+      text(size: 14pt, fill: rgb("#444444"), style: "italic")[#subtitle]
+    }
+    if author != none {
+      v(1.2em)
+      text(size: 12pt)[#_fmt-authors(author)]
+    }
+    if date != none {
+      v(0.4em)
+      text(size: 10pt, fill: rgb("#888888"))[#date]
+    }
+    v(0.8em)
+    line(length: 100%, stroke: 0.5pt + sdu-red)
+    v(1em)
+  })
+  if outline { std.outline(depth: outline-depth) }
+  body
+}
+
 // ── submission ───────────────────────────────────────
 // Like #project, but no frontpage/outline — just the title card,
 // then straight into the body content on the same page.
@@ -369,7 +418,7 @@
   author: none,
   supervisor: none,
   institution: sdu-university,
-  date: default-date,
+  date: none,
   logo: none,
   course: none,
   group: none,
@@ -414,7 +463,7 @@
         let sup = as-array(supervisor)
         field(if sup.len() > 1 [Supervisors #v(0.5em)] else [Supervisor #v(0.5em)], sup.join(linebreak()))
       },
-      field[Date #v(0.5em)][#date],
+      if date != none { field[Date #v(0.5em)][#date] },
       if institution != none { field[Institution #v(0.5em)][#institution] },
     ).filter(f => f != none)
     std.block(
@@ -436,7 +485,7 @@
   subtitle: none,
   author: default-author,
   course: default-course,
-  date: default-date,
+  date: none,
   student-id: none,
   username: none,
   student-number: none,
@@ -538,8 +587,10 @@
               text(fill: rgb("#777777"))[*Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]:*],
               text()[#_fmt-authors(supervisor)])
           },
-          grid(columns: (4cm, 1fr),
-            text(fill: rgb("#777777"))[*Date:*], text()[#date]),
+          if date != none {
+            grid(columns: (4cm, 1fr),
+              text(fill: rgb("#777777"))[*Date:*], text()[#date])
+          },
         ))
       ),
       if logo != none { stack(v(1.8em), logo) },

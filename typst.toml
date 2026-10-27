@@ -1,6 +1,6 @@
 [package]
 name = "sdust"
-version = "0.1.0"
+version = "0.2.0"
 entrypoint = "lib.typ"
 authors = ["Simon Holm (@simo899t)"]
 license = "MIT"
@@ -10,4 +10,4 @@ keywords = ["template", "sdu", "thesis", "academic", "university"]
 categories = ["report", "thesis"]
 disciplines = ["education", "computer-science", "mathematics"]
 compiler = "0.13.0"
-exclude = ["tests/**", "assets/**", ".claude/**", ".vscode/**", ".DS_Store", "CHANGELOG.md", "examples.typ", "preview.png", "cards.png"]
+exclude = ["tests/**", "docs/**", "assets/**", ".claude/**", ".vscode/**", ".DS_Store", "CHANGELOG.md", "examples.typ", "preview.png", "cards.png"]

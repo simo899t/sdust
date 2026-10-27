@@ -1,5 +1,6 @@
 .DS_Store
 *.pdf
+!docs/manual.pdf
 /tests/**/diff/
 
 # Editor / tooling — local only, never tracked

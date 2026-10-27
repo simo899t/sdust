@@ -3,12 +3,12 @@
 Ready-to-use, SDU-branded document frontpages for coursework at the
 University of Southern Denmark (Syddansk Universitet), a title page and page setup for every kind of hand-in.
 
-![Thesis, lecture-note, exercise and assignment cover pages produced by sdust](preview.png)
+![Thesis, lecture-note, exercise and assignment cover pages produced by sdust](https://raw.githubusercontent.com/simo899t/sdust/master/preview.png)
 
 ## Quick start
 
 ```typst
-#import "@preview/sdust:0.1.0": *
+#import "@preview/sdust:0.2.0": *
 
 #show: note.with(
   title:  "Analysis & Topology",
@@ -28,7 +28,7 @@ accent, sets up 1.5 line spacing, numbered headings and a centred
 Want the styling without a cover page? Use `page-setup`:
 
 ```typst
-#import "@preview/sdust:0.1.0": *
+#import "@preview/sdust:0.2.0": *
 #show: page-setup
 
 = First Section
@@ -59,6 +59,7 @@ SDUs own website:
 | `exercise`   | Exercise sheets                                 |
 | `assignment` | Assignments                                     |
 | `project`    | Group / solo project reports                    |
+| `basic`      | Just title, authors and date, no cover page     |
 | `submission` | Lightweight hand-in title card                  |
 | `exam`       | Exam submissions                                |
 | `research`   | arXiv/ICML-style paper, two columns by default  |
@@ -71,6 +72,8 @@ Common named arguments: `title`, `subtitle`, `author` (string or array),
 `columns:`, `running-title:` and `repo:` (URL), and authors as dicts
 `(name:, affiliation: 1 | (1, 2), equal: true, email:)`; `exam` takes `duration:`,
 `student-number:` and more.
+
+See the [**manual (PDF)**](https://github.com/simo899t/sdust/blob/master/docs/manual.pdf) for every parameter of every template and block, with defaults.
 
 ## Page cards
 
@@ -105,7 +108,7 @@ Coloured titled cards for notes and exercises — `theorem`, `definition`,
 ]
 ```
 
-![theorem, definition, example, proof and question/answer blocks](cards.png)
+![theorem, definition, example, proof and question/answer blocks](https://raw.githubusercontent.com/simo899t/sdust/master/cards.png)
 
 The title argument is optional (`#theorem[...]` defaults to "Theorem").
 
@@ -116,7 +119,7 @@ adapt to a dark editor preview.
 
 `boxed` frames a key result. A block equation is centred like a normal
 display equation; anything else is framed inline. Optional `fill:`,
-`stroke:`, `inset:`, `radius:`.
+`stroke:` (thickness), `stroke-color:`, `inset:`, `radius:`.
 
 ```typst
 #boxed($ e^(i pi) + 1 = 0 $)

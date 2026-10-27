@@ -89,10 +89,16 @@
   [#content],
 )
 
-// gray default block, e.g. #block(title: "Note")[Body text.]
-#let block(title: none, width: 100%, content) = _titled-card(
+// gray default block, e.g. #block(title: "Note", header-fill: sdu-red)[Body text.]
+#let block(
+  title: none,
+  width: 100%,
+  header-fill: rgb("#7c8592"),
+  body-fill: rgb("#f3f4f6"),
+  content,
+) = _titled-card(
   title: title, width: width,
-  header-fill: rgb("#7c8592"), body-fill: rgb("#f3f4f6"),
+  header-fill: header-fill, body-fill: body-fill,
   border: rgb("#d1d5db"), body-text-fill: rgb("#1f2937"),
   content,
 )
@@ -131,13 +137,14 @@
 //   the bound #boxed($O(n log n)$)    // inline
 #let boxed(
   body,
-  stroke: 0.6pt + black,
+  stroke: 0.6pt,
+  stroke-color: black,
   fill: none,
   inset: (x: 8pt, y: 6pt),
   radius: 2pt,
 ) = {
   let framed = box(
-    stroke: stroke,
+    stroke: stroke + stroke-color,
     fill: fill,
     inset: inset,
     radius: radius,
