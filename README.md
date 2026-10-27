@@ -61,11 +61,15 @@ SDUs own website:
 | `project`    | Group / solo project reports                    |
 | `submission` | Lightweight hand-in title card                  |
 | `exam`       | Exam submissions                                |
+| `research`   | arXiv/ICML-style paper, two columns by default  |
 
 Common named arguments: `title`, `subtitle`, `author` (string or array),
 `supervisor`, `course`, `date`, `logo`, `outline`, `outline-depth`.
 `thesis` also takes `department:` and `programme:`; `project` takes
-`group:`, `abstract:` and `keywords:`; `exam` takes `duration:`,
+`group:`, `abstract:`, `keywords:`, `info-width:` and `author-dots:`;
+`research` takes `affiliations:` (array), `abstract:`, `keywords:`,
+`columns:`, `running-title:` and `repo:` (URL), and authors as dicts
+`(name:, affiliation: 1 | (1, 2), equal: true, email:)`; `exam` takes `duration:`,
 `student-number:` and more.
 
 ## Page cards

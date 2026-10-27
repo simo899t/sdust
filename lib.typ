@@ -1,6 +1,7 @@
 // sdust, SDU-branded document assets for Typst.
 //
-// templates: thesis, note, exercise, assignment, project, submission, exam.
+// templates: thesis, note, exercise, assignment, project, submission, exam,
+// research.
 // Each takes inputs like `title`, `author` and `supervisor` and builds a
 // cover page, an optional outline, then basic base styling.
 //
@@ -17,3 +18,4 @@
 #import "src/base.typ": *
 #import "src/cards.typ": *
 #import "src/frontpages.typ": *
+#import "src/research.typ": *

@@ -33,6 +33,8 @@
   // 1.5 line spacing.
   set par(justify: true, leading: 0.65em)
   set image(width: 30em)
+  show link: set text(fill: rgb("#0000EE"))
+  show link: underline 
   body
 }
 

@@ -15,6 +15,11 @@
   else { author }
 }
 
+#let _fmt-lines(names) = {
+  if type(names) == array { names.join(linebreak()) }
+  else { names }
+}
+
 // ── thesis ───────────────────────────────────────────
 #let thesis(
   title: default-title,
@@ -238,6 +243,8 @@
   keywords: none,
   outline: true,
   outline-depth: none,
+  info-width: 60%,
+  author-dots: false,
   ..args,
 ) = {
   let body = args.pos().at(0, default: [])
@@ -278,7 +285,10 @@
 
         let per-row = 3
         let row-starts = range(0, author-arr.len(), step: per-row)
-        stack(spacing: 1.5em,
+        if author-dots {
+          align(center, text(weight: "bold", size: 11pt,
+            author-arr.map(a => a.at("name", default: "")).join(" · ")))
+        } else { stack(spacing: 1.5em,
           ..row-starts.map(i => {
             let row = author-arr.slice(i, calc.min(i + per-row, author-arr.len()))
             align(center,
@@ -288,11 +298,11 @@
               )
             )
           })
-        )
+        ) }
       },
       v(1.5em),
       std.block(
-        width: 60%,
+        width: info-width,
         stroke: (top: 0.5pt + rgb("#aaaaaa"), bottom: 0.5pt + rgb("#aaaaaa")),
         inset: (top: 1em, bottom: 1em),
         align(left, stack(
@@ -361,6 +371,9 @@
   institution: sdu-university,
   date: default-date,
   logo: none,
+  course: none,
+  group: none,
+  info-width: 70%,
   ..args,
 ) = {
   let body = args.pos().at(0, default: [])
@@ -368,40 +381,52 @@
   // doesn't force a page break between the title card and the body.
   show: base-style
   set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
-  align(center,
-    stack(
-      spacing: 0pt,
-      text(size: 28pt, weight: "bold")[#title],
-      if subtitle != none {
-        stack(v(1.5em), text(size: 15pt, fill: rgb("#444444"), style: "italic")[#subtitle])
+  let muted = rgb("#666666")
+  let rule = rgb("#bbbbbb")
+  let as-array(x) = if type(x) == array { x } else { (x,) }
+  let label(t) = text(size: 8pt, fill: muted, tracking: 1.2pt, weight: "bold", upper(t))
+  let field(name, value) = stack(spacing: 0.6em, label(name), value)
+  align(center, {
+    set par(justify: false, leading: 0.6em)
+    set text(hyphenate: false)
+    text(size: 22pt, weight: "bold")[#title]
+    if subtitle != none {
+      v(0.6em)
+      text(size: 14pt, fill: rgb("#444444"), style: "italic")[#subtitle]
+    }
+    if course != none {
+      v(0.8em)
+      text(size: 12pt, fill: muted)[#course]
+    }
+    if author != none {
+      v(2em)
+      let names = as-array(author)
+      grid(columns: names.len(), column-gutter: 2.5em,
+        ..names.map(n => text(size: 12pt, weight: "bold")[#n]))
+    }
+    if group != none {
+      v(0.6em)
+      text(size: 10pt, fill: muted, style: "italic")[Group: #group]
+    }
+    v(1em)
+    let fields = (
+      if supervisor != none {
+        let sup = as-array(supervisor)
+        field(if sup.len() > 1 [Supervisors #v(0.5em)] else [Supervisor #v(0.5em)], sup.join(linebreak()))
       },
-      v(2em),
-      std.block(
-        width: 70%,
-        stroke: (top: 0.5pt + rgb("#aaaaaa"), bottom: 0.5pt + rgb("#aaaaaa")),
-        inset: (top: 1em, bottom: 1em),
-        align(left, stack(
-          spacing: 1.5em,
-          if author != none {
-            grid(columns: (4cm, 1fr),
-              text(fill: rgb("#777777"))[*Author#if type(author) == array and author.len() > 1 [s]:*],
-              text()[#_fmt-authors(author)])
-          },
-          if supervisor != none {
-            grid(columns: (4cm, 1fr),
-              text(fill: rgb("#777777"))[*Supervisor#if type(supervisor) == array and supervisor.len() > 1 [s]:*],
-              text()[#_fmt-authors(supervisor)])
-          },
-          grid(columns: (4cm, 1fr),
-            text(fill: rgb("#777777"))[*Date:*], text()[#date]),
-          grid(columns: (4cm, 1fr),
-            text(fill: rgb("#777777"))[*Institution:*], text()[#institution]),
-        ))
-      ),
-      if logo != none { stack(v(1.8em), logo) },
-      v(1cm),
+      field[Date #v(0.5em)][#date],
+      if institution != none { field[Institution #v(0.5em)][#institution] },
+    ).filter(f => f != none)
+    std.block(
+      width: info-width,
+      stroke: (top: 0.5pt + rule, bottom: 0.5pt + rule),
+      inset: (y: 1.1em),
+      align(center, grid(columns: (auto,) * fields.len(), column-gutter: 3em, align: center + top,
+        ..fields.map(f => text(size: 10pt, f))))
     )
-  )
+    if logo != none { v(1.8em); logo }
+    v(1cm)
+  })
   body
 }
 
