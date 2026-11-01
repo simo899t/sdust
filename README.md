@@ -3,7 +3,7 @@
 Ready-to-use, SDU-branded document frontpages for coursework at the
 University of Southern Denmark (Syddansk Universitet), a title page and page setup for every kind of hand-in.
 
-![Thesis, lecture-note, exercise and assignment cover pages produced by sdust](https://raw.githubusercontent.com/simo899t/sdust/master/preview.png)
+![Thesis, lecture-note, exercise and assignment cover pages produced by sdust](https://raw.githubusercontent.com/simo899t/sdust/6c20cbe78d53dfde5d88046bb29b4d58843cd669/preview.png)
 
 ## Quick start
 
@@ -73,7 +73,7 @@ Common named arguments: `title`, `subtitle`, `author` (string or array),
 `(name:, affiliation: 1 | (1, 2), equal: true, email:)`; `exam` takes `duration:`,
 `student-number:` and more.
 
-See the [**manual (PDF)**](https://github.com/simo899t/sdust/blob/master/docs/manual.pdf) for every parameter of every template and block, with defaults.
+See the [**manual (PDF)**](https://github.com/simo899t/sdust/blob/6c20cbe78d53dfde5d88046bb29b4d58843cd669/docs/manual.pdf) for every parameter of every template and block, with defaults.
 
 ## Page cards
 
@@ -88,7 +88,7 @@ Coloured titled cards for notes and exercises — `theorem`, `definition`,
 
 #definition(title: "Definition 1.2 (Spectral gap)")[
   The _spectral gap_ of $G$ is 
-  #boxed[$ gamma = lambda_2 - lambda_1 $.
+  #boxed[$ gamma = lambda_2 - lambda_1 $].
 ]
 
 #example(title: "Example 1.3")[
@@ -108,7 +108,7 @@ Coloured titled cards for notes and exercises — `theorem`, `definition`,
 ]
 ```
 
-![theorem, definition, example, proof and question/answer blocks](https://raw.githubusercontent.com/simo899t/sdust/master/cards.png)
+![theorem, definition, example, proof and question/answer blocks](https://raw.githubusercontent.com/simo899t/sdust/6c20cbe78d53dfde5d88046bb29b4d58843cd669/cards.png)
 
 The title argument is optional (`#theorem[...]` defaults to "Theorem").
 
