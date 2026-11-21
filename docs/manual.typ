@@ -4,7 +4,7 @@
 #show: basic.with(
   title: "sdust parameter manual",
   subtitle: "Every parameter of every template and blocks",
-  course: "sdust 0.2.0",
+  course: "sdust 0.2.1",
   author: "by Simon Holm",
   outline: true,
   outline-depth: 1

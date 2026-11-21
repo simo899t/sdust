@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 — 2026-11-21
+
+- `thesis`: the cover page always fits on one page. A large logo or many fields no longer push content (such as the date) onto a blank second page.
+- `thesis`: the logo is laid out in a fixed-height slot, and the date sits at the bottom of the cover page.
+
 ## 0.2.0 — 2026-10-28
 
 - New `basic` template: title, subtitle, authors and date above the body, no cover page.

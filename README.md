@@ -8,7 +8,7 @@ University of Southern Denmark (Syddansk Universitet), a title page and page set
 ## Quick start
 
 ```typst
-#import "@preview/sdust:0.2.0": *
+#import "@preview/sdust:0.2.1": *
 
 #show: note.with(
   title:  "Analysis & Topology",
@@ -28,7 +28,7 @@ accent, sets up 1.5 line spacing, numbered headings and a centred
 Want the styling without a cover page? Use `page-setup`:
 
 ```typst
-#import "@preview/sdust:0.2.0": *
+#import "@preview/sdust:0.2.1": *
 #show: page-setup
 
 = First Section
