@@ -37,10 +37,10 @@
 ) = {
   let body = args.pos().at(0, default: [])
   set page(paper: "a4", margin: (left: 3cm, right: 3cm, top: 3cm, bottom: 3cm))
-  align(center,
+  align(center, block(width: 100%, height: 100%, breakable: false,
     stack(
       spacing: 0pt,
-      if logo != none { stack(v(1.4cm), scale(220%)[#logo], v(2.6cm)) } else { v(1.2cm) },
+      if logo != none { stack(v(1.4cm), box(height: 4cm, align(horizon, scale(220%)[#logo])), v(2.6cm)) } else { v(1.2cm) },
       text(size: 17pt, fill: rgb("#555555"))[#smallcaps[#university]],
 
       v(0.6em),
@@ -56,7 +56,7 @@
       },
       v(1em),
       line(length: 40%, stroke: 0.5pt + rgb("#aaaaaa")),
-      v(10em),
+      v(1fr),
       if supervisor != none {
         stack(
           v(2.5em),
@@ -80,10 +80,10 @@
       if department != none {
         stack(v(0.4em), text(size: 14pt, fill: rgb("#777777"))[#smallcaps[#_fmt-lines(department)]])
       },
-      v(6em),
+      v(1fr),
       if date != none { text(size: 12pt, fill: rgb("#888888"))[#date] },
     )
-  )
+  ))
   pagebreak()
   if outline { std.outline(depth: outline-depth); pagebreak() }
   base-style(body)
